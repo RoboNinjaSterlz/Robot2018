@@ -59,9 +59,6 @@ public class OI {
     public Joystick driveRight;
     public JoystickButton elevatorHighButton;
     public JoystickButton elevatorLowButton;
-    public JoystickButton compLowGoalButton;
-    public JoystickButton lowGoalInButton;
-    public JoystickButton floorBeltOutButton;
     public JoystickButton compGearGrabButton;
     public JoystickButton gearReleaseButton;
     public JoystickButton compPrePickupButton;
@@ -101,12 +98,6 @@ public class OI {
         gearReleaseButton.whenPressed(new GearRelease());
         compGearGrabButton = new JoystickButton(operatorJoy, 2);
         compGearGrabButton.whenPressed(new CompGrab());
-        floorBeltOutButton = new JoystickButton(operatorJoy, 6);
-        floorBeltOutButton.whileHeld(new FloorBeltOut());
-        lowGoalInButton = new JoystickButton(operatorJoy, 5);
-        lowGoalInButton.whileHeld(new LowGoalIn());
-        compLowGoalButton = new JoystickButton(operatorJoy, 3);
-        compLowGoalButton.whileHeld(new CompLowGoal());
         elevatorLowButton = new JoystickButton(operatorJoy, 9);
         elevatorLowButton.whenPressed(new ElevatorLow());
         elevatorHighButton = new JoystickButton(operatorJoy, 7);
