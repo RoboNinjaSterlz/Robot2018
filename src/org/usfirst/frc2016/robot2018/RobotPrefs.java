@@ -58,15 +58,6 @@ public class RobotPrefs {
 		Robot.gearElevator.presetPositions[Robot.gearElevator.HIGH] = 
 				prefs.getDouble("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.HIGH], Defaults.ELEVATORPOSITION3);
 		//Gear Slide
-		Robot.gearSlide.lowerLimit = 
-				prefs.getDouble("Slide Lower Limit", Defaults.SLIDELOWERLIMIT);
-		Robot.gearSlide.upperLimit = 
-				prefs.getDouble("Slide Upper Limit", Defaults.SLIDEUPPERLIMIT);
-		
-		Robot.highGoalShooter.presetSpeed[0] = 
-				prefs.getDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[0], Defaults.WHEEL_SPEED0);
-		Robot.highGoalShooter.presetSpeed[1] = 
-				prefs.getDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[1], Defaults.WHEEL_SPEED1);
 
 		/*
  		Robot.highGoalShooter.presetSpeed[2] = 
@@ -110,12 +101,6 @@ public class RobotPrefs {
 			prefs.putDouble("Slide Upper Limit", Defaults.SLIDEUPPERLIMIT);
 		}
 		
-		if (!prefs.containsKey("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[0])) {
-			prefs.putDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[0], Defaults.WHEEL_SPEED0);
-		}
-		if (!prefs.containsKey("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[1])) {
-			prefs.putDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[1], Defaults.WHEEL_SPEED1);
-		}
 /*
 		if (!prefs.containsKey("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[2])) {
 			prefs.putDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[2], Defaults.WHEEL_SPEED2);
