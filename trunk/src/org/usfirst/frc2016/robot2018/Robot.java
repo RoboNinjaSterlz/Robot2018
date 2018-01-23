@@ -289,8 +289,10 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBoolean("WeGrabbedTheGear", gearElevator.haveTheGear());
 		SmartDashboard.putBoolean("AutoSwitch", Robot.oi.cCI.getRawButton(1));
 		SmartDashboard.putBoolean("Gear Detector", RobotMap.gearInDetector.get());
-		SmartDashboard.putBoolean("LeftDrive Fault", Robot.currentMonitor.driveLeftFalt());
-		SmartDashboard.putBoolean("RightDrive Fault", Robot.currentMonitor.driveRightFalt());
+		SmartDashboard.putBoolean("LeftDrive Fault", Robot.currentMonitor.driveLeftFault());
+		SmartDashboard.putBoolean("RightDrive Fault", Robot.currentMonitor.driveRightFault());
+		SmartDashboard.putBoolean("Winch1 Fault", Robot.currentMonitor.winchFault1());
+		SmartDashboard.putBoolean("Winch2 Fault", Robot.currentMonitor.winchFault2());
 	}
 }
 
