@@ -11,6 +11,7 @@
 
 package org.usfirst.frc2016.robot2018.subsystems;
 
+import org.usfirst.frc2016.robot2018.Robot;
 import org.usfirst.frc2016.robot2018.RobotMap;
 import org.usfirst.frc2016.robot2018.commands.WinchStop;
 
@@ -37,6 +38,10 @@ public class Winch extends Subsystem {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
+
+    public void periodic() {
+    	Robot.currentMonitor.winchCurrentReport(winchSpark.get());
+    }
     public void lift()
     {
     /*	if (pdPanel.getCurrent(11) >= 5) {
