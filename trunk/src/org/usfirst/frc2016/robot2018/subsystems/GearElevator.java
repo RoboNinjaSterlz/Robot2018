@@ -126,19 +126,17 @@ public class GearElevator extends Subsystem {
 		desiredPosition = 0;
 //		gearElevatorTalon.setPosition(0);
 //		gearElevatorTalon.changeControlMode(TalonControlMode.Position);
-		gearElevatorTalon.setSelectedSensorPosition(0,0,0);
-       	gearElevatorTalon.set(ControlMode.Position, 0);
-		
 		// reset the encoder
+		gearElevatorTalon.setSelectedSensorPosition(0,0,0);
+//     	gearElevatorTalon.set(ControlMode.Position, 0);
+		needsCalibrate = false;
+		
 //		gearElevatorTalon.set(presetPositions[PREPICKUP]);
-		gearElevatorTalon.set(ControlMode.Position, presetPositions[PREPICKUP]);
-       	
-//		gearElevatorTalon.reverseSensor(false);
-//		gearElevatorTalon.reverseOutput(true);
+//		gearElevatorTalon.set(ControlMode.Position, presetPositions[PREPICKUP]);
+//		lastPreset=PREPICKUP;
+		goToPreset(PREPICKUP);
 //		gearElevatorTalon.enable;
 // Don't know the replacement for enable
-		lastPreset=PREPICKUP;
-		needsCalibrate = false;
     }
     
     public void doCalibrate() {
