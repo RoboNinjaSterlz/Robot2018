@@ -77,6 +77,7 @@ public class CurrentMonitor extends Subsystem {
     	        powerDistributionPanel1.getCurrent(leftDrivePort3) == 0 ) {
     			driveLeftFail = true;
     		}
+/*
     		else {
     			driveLeftFail = false;
     		}
@@ -85,7 +86,8 @@ public class CurrentMonitor extends Subsystem {
     	else {
     		driveLeftFail = false;
     	}
-
+*/
+    	}
     	if (driveTrainThrottleRight !=0) {
     		if (powerDistributionPanel1.getCurrent(rightDrivePort1) == 0 ||
     	    	powerDistributionPanel1.getCurrent(rightDrivePort2) ==0 ||
@@ -93,33 +95,37 @@ public class CurrentMonitor extends Subsystem {
     	    	// Signal wiring fault
     			driveRightFail = true;
     	   	}
-    		else {
+    	}
+    	/*  		else {
     			driveRightFail = false;
     		}
     	}
     	else {
     		driveRightFail = false;
     	}
-
+*/
+    
     	if (winchThrottle !=0) {
     		if (powerDistributionPanel1.getCurrent(winchPort1) == 0 ) {
     			// Signal wiring fault
     			winchFail1 = true;
     		}
-    		else {
+    	}
+  /*  		else {
     			winchFail1 = false;
     		}
     	}
     	else {
     		winchFail2 = false;
     	}	
-
+*/
     	if (winchThrottle !=0) {
     		if (powerDistributionPanel1.getCurrent(winchPort2) == 0 ) {
     			// Signal wiring fault
     			winchFail2 = true;
     		}
-    		else {
+    	}
+  /*  		else {
     			winchFail2 = false;
     		}
     	}
@@ -127,8 +133,9 @@ public class CurrentMonitor extends Subsystem {
     		winchFail2 = false;
     	}	
     }
-
-    // Put methods for controlling this subsystem
+*/
+    }
+    	// Put methods for controlling this subsystem
     // here. Call these from Commands.
 
     public void driveTrainCurrentReport(double leftThrottle, double rightThrottle) {

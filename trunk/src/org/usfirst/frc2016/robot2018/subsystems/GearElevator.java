@@ -89,7 +89,7 @@ public class GearElevator extends Subsystem {
 //    	gearElevatorTalon.setProfile(0);
     	gearElevatorTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
 //    	gearElevatorTalon.reverseSensor(true);
-    	gearElevatorTalon.setSensorPhase(false); //!!!! Check this !!!!!
+    	gearElevatorTalon.setSensorPhase(true); //!!!! Check this !!!!!
 //    	gearElevatorTalon.reverseOutput(false);
     	gearElevatorTalon.setInverted(false);
 //    	gearElevatorTalon.setAllowableClosedLoopErr(0);
