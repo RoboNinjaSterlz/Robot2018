@@ -145,6 +145,7 @@ public class Robot extends TimedRobot {
         drivetrain = new Drivetrain();
         gyro = new Gyro();
         winch = new Winch();
+        SmartDashboard.putData(winch);
         gearElevator = new GearElevator();
         gearGrabber = new GearGrabber();
         cameras = new Cameras();
