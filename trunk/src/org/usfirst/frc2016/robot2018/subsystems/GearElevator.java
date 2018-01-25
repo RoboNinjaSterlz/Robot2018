@@ -123,7 +123,7 @@ public class GearElevator extends Subsystem {
     public void completeCalibration(){
 //		gearElevatorTalon.set(0); // Turn off output
        	gearElevatorTalon.set(ControlMode.PercentOutput, 0);
-		desiredPosition = 0;
+		desiredPosition = presetPositions[PREPICKUP];
 //		gearElevatorTalon.setPosition(0);
 //		gearElevatorTalon.changeControlMode(TalonControlMode.Position);
 		// reset the encoder
@@ -132,9 +132,9 @@ public class GearElevator extends Subsystem {
 		needsCalibrate = false;
 		
 //		gearElevatorTalon.set(presetPositions[PREPICKUP]);
-//		gearElevatorTalon.set(ControlMode.Position, presetPositions[PREPICKUP]);
-//		lastPreset=PREPICKUP;
-		goToPreset(PREPICKUP);
+		gearElevatorTalon.set(ControlMode.Position, desiredPosition); //presetPositions[PREPICKUP]);
+		lastPreset=PREPICKUP;
+//		goToPreset(PREPICKUP);
 //		gearElevatorTalon.enable;
 // Don't know the replacement for enable
     }
@@ -247,7 +247,9 @@ public class GearElevator extends Subsystem {
      
     	// mostly for debugging updates the smart dashboard with position info
     	public void periodic() {
-    		SmartDashboard.putNumber("GearElevatorTalon Desired Pos", gearElevatorTalon.getClosedLoopTarget(0));
+    		if (isCalibrated()) {
+    			SmartDashboard.putNumber("GearElevatorTalon Desired Pos", gearElevatorTalon.getClosedLoopTarget(0));
+    		}
 //    		getSetpoint());
     		SmartDashboard.putNumber("GearElevator Position", getPosition());
     		SmartDashboard.putNumber("GearElevator Position Error", getPositionError());

@@ -26,17 +26,17 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
  */
 public class CurrentMonitor extends Subsystem {
 	private final int
-	            leftDrivePort1=0,
-			    leftDrivePort2=1,
-			    leftDrivePort3=2;
+	            leftDrivePort1=12,
+			    leftDrivePort2=13,
+			    leftDrivePort3=13;
 	private final int
-	            rightDrivePort1=3,
-	            rightDrivePort2=4,
-	            rightDrivePort3=5;
+	            rightDrivePort1=14,
+	            rightDrivePort2=15,
+	            rightDrivePort3=15;
 	
 	private final int
-				winchPort1 = 6,
-				winchPort2 = 7;
+				winchPort1 = 9,
+				winchPort2 = 11;
 
 	private boolean driveLeftFail = false,
 			        driveRightFail = false;
