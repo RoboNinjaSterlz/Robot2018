@@ -70,12 +70,15 @@ public class CurrentMonitor extends Subsystem {
     	// Drive train
     	for (int i=0; i<numPdPorts; i++) {
     		if (currentStatus[i].throttle != 0) {
-    			if (powerDistributionPanel1.getCurrent(i) == 0 && currentStatus[i].failCount < FAILTHRESHOLD) {
+    			if (powerDistributionPanel1.getCurrent(i) == 0 && currentStatus[i].failCount <= FAILTHRESHOLD) {
     				currentStatus[i].failCount++;
-    				if (currentStatus[i].failCount > FAILTHRESHOLD) {
+    				if (currentStatus[i].failCount >= FAILTHRESHOLD) {
     					currentStatus[i].fail = true;
     			    }
     		    }
+    			else if (powerDistributionPanel1.getCurrent(i) != 0) {
+    				currentStatus[i].failCount=0;
+    			}
     	    }
     	}
     }
