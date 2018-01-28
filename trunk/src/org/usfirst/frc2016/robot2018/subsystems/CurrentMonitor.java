@@ -30,13 +30,13 @@ public class CurrentMonitor extends Subsystem {
 	private final int FAILTHRESHOLD = 100;
 	private final double THROTTLETHRESHOLD = .2;
 	private final int
-	            leftDrivePort1=12,
-			    leftDrivePort2=13,
-			    leftDrivePort3=13;
+	            leftDrivePort1=0,
+			    leftDrivePort2=2,
+			    leftDrivePort3=3;
 	private final int
 	            rightDrivePort1=14,
-	            rightDrivePort2=15,
-	            rightDrivePort3=15;
+	            rightDrivePort2=13,
+	            rightDrivePort3=1;
 	
 	private final int
 				winchPort1 = 9,
@@ -84,9 +84,9 @@ public class CurrentMonitor extends Subsystem {
     	    }
     	}
     	SmartDashboard.putNumber("Fail count 9", currentStatus[9].failCount);
-    	SmartDashboard.putNumber("9 Current", powerDistributionPanel1.getCurrent(9));
+    	SmartDashboard.putNumber("0 Current", powerDistributionPanel1.getCurrent(0));
     	SmartDashboard.putNumber("Fail count 11", currentStatus[11].failCount);
-    	SmartDashboard.putNumber("11 Current", powerDistributionPanel1.getCurrent(11));
+    	SmartDashboard.putNumber("14 Current", powerDistributionPanel1.getCurrent(14));
     }
     		
     public void driveTrainCurrentReport(double leftThrottle, double rightThrottle) {

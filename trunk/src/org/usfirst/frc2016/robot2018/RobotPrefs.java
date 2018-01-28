@@ -50,23 +50,14 @@ public class RobotPrefs {
 				prefs.getDouble("StraightGearDistance" , Defaults.STRAIGHTGEARDISTANCE);
 
 		
-		//Gear Elevator
-		Robot.gearElevator.presetPositions[Robot.gearElevator.LOW] = 
-				prefs.getDouble("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.LOW], Defaults.ELEVATORPOSITION1);
-		Robot.gearElevator.presetPositions[Robot.gearElevator.PREPICKUP] = 
-				prefs.getDouble("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.PREPICKUP], Defaults.ELEVATORPOSITION2);
-		Robot.gearElevator.presetPositions[Robot.gearElevator.HIGH] = 
-				prefs.getDouble("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.HIGH], Defaults.ELEVATORPOSITION3);
-		//Gear Slide
-
 		/*
  		Robot.highGoalShooter.presetSpeed[2] = 
 				prefs.getDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[2], Defaults.WHEEL_SPEED2);
 		Robot.highGoalShooter.presetSpeed[3] = 
 				prefs.getDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[3], Defaults.WHEEL_SPEED3);
 */
-		Robot.drivetrain.drivetrainVoltageLimit = prefs.getDouble("drivetrainVoltageLimit", Defaults.DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT);
-        Robot.drivetrain.setMax();
+		Robot.driveTrainSRX.drivetrainVoltageLimit = prefs.getDouble("drivetrainVoltageLimit", Defaults.DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT);
+        Robot.driveTrainSRX.setMax();
 	}
 
 
@@ -83,32 +74,7 @@ public class RobotPrefs {
 		if (!prefs.containsKey("StraightGearDistance")) {
 			prefs.putDouble("StraightGearDistance", Defaults.STRAIGHTGEARDISTANCE);
 		}
-		// Elevator
-		if (!prefs.containsKey("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.LOW])) {
-			prefs.putDouble("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.LOW], Defaults.ELEVATORPOSITION1);
-		}
-		if (!prefs.containsKey("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.PREPICKUP]))  {	
-			prefs.putDouble("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.PREPICKUP], Defaults.ELEVATORPOSITION2);
-		}
-		if (!prefs.containsKey("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.HIGH]))  {	
-			prefs.putDouble("Elevator "+Robot.gearElevator.ElevatorPositionLabels[Robot.gearElevator.HIGH], Defaults.ELEVATORPOSITION3);
-		}
-		// Slide
-		if (!prefs.containsKey("Slide Lower Limit")) {
-			prefs.putDouble("Slide Lower Limit", Defaults.SLIDELOWERLIMIT);
-		}
-		if (!prefs.containsKey("Slide Upper Limit")) {
-			prefs.putDouble("Slide Upper Limit", Defaults.SLIDEUPPERLIMIT);
-		}
 		
-/*
-		if (!prefs.containsKey("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[2])) {
-			prefs.putDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[2], Defaults.WHEEL_SPEED2);
-		}
-		if (!prefs.containsKey("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[3])) {
-			prefs.putDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[3], Defaults.WHEEL_SPEED3);
-		}
- */
 		
 		if (!prefs.containsKey("drivetrainVoltageLimit")) {
 			prefs.putDouble("drivetrainVoltageLimit", Defaults.DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT);
