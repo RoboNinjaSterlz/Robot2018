@@ -44,8 +44,8 @@ public class CameraDrive extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	lEncoderStart = Robot.drivetrain.getLeftEncoder();
-    	rEncoderStart = Robot.drivetrain.getRightEncoder();
+    	lEncoderStart = Robot.driveTrainSRX.getLeftEncoder();
+    	rEncoderStart = Robot.driveTrainSRX.getRightEncoder();
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -53,18 +53,18 @@ public class CameraDrive extends Command {
     	// Get steering error from PI
     	targetCorrection = SmartDashboard.getNumber("GearAlignTargetCorrection", -255);
     	if (targetCorrection != -255) {
-    		Robot.drivetrain.arcadeDrive(DRIVESPEED, targetCorrection*ERROR_MULTIPLIER);
+    		Robot.driveTrainSRX.arcadeDrive(DRIVESPEED, targetCorrection*ERROR_MULTIPLIER);
     	}
     	else {
     		// for now drive straight should alert the drivers!!
-    		Robot.drivetrain.arcadeDrive(DRIVESPEED, 0);
+    		Robot.driveTrainSRX.arcadeDrive(DRIVESPEED, 0);
     	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	if ( m_distance !=0 ) {
-    		return(m_distance <= Math.abs((Robot.drivetrain.getRightEncoder() - rEncoderStart)));
+    		return(m_distance <= Math.abs((Robot.driveTrainSRX.getRightEncoder() - rEncoderStart)));
     	}
     	else {
     		return false;

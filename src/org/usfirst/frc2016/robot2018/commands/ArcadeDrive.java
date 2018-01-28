@@ -48,15 +48,15 @@ public class ArcadeDrive extends Command {
     }
     // Called just before this Command runs the first time
     protected void initialize() {
-    	lEncoderStart = Robot.drivetrain.getLeftEncoder();
-    	rEncoderStart = Robot.drivetrain.getRightEncoder();
+    	lEncoderStart = Robot.driveTrainSRX.getLeftEncoder();
+    	rEncoderStart = Robot.driveTrainSRX.getRightEncoder();
     	//Robot.gyro.reset();
     	
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	//Robot.drivetrain.arcadeDrive(Robot.oi.getDriveLeft());
+    	//Robot.driveTrainSRX.arcadeDrive(Robot.oi.getDriveLeft());
 //    	double steer =  -gyroP * (Robot.gyro.getAngle() - m_angle);
     	waitCounter++;
     	double steer =  (Robot.gyro.getAngle() - m_angle);
@@ -76,10 +76,10 @@ public class ArcadeDrive extends Command {
     	}
     	if (m_speed== 0) {
     		//Use the joystick or stop if centered
-    		Robot.drivetrain.arcadeDrive(Robot.oi.driveLeft.getY(), steer);
+    		Robot.driveTrainSRX.arcadeDrive(Robot.oi.driveLeft.getY(), steer);
     	}
     	else {
-    		Robot.drivetrain.arcadeDrive(m_speed, steer);
+    		Robot.driveTrainSRX.arcadeDrive(m_speed, steer);
     	}
     }
 
@@ -87,7 +87,7 @@ public class ArcadeDrive extends Command {
     protected boolean isFinished() {
     	boolean done = false;
     	if ( m_distance !=0 ) {
-    		done = (m_distance <= Math.abs((Robot.drivetrain.getRightEncoder() - rEncoderStart)));
+    		done = (m_distance <= Math.abs((Robot.driveTrainSRX.getRightEncoder() - rEncoderStart)));
     	}
     	else {
     		//if (m_angle != 0 && m_distance == 0) {
@@ -104,7 +104,7 @@ public class ArcadeDrive extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	Robot.drivetrain.driveStop();
+    	Robot.driveTrainSRX.driveStop();
     }
 
     // Called when another command which requires one or more of the same

@@ -75,7 +75,7 @@ public class CameraDriveGyro extends Command {
    		else if (lastValidTargetCorrection > 20){
    			lastValidTargetCorrection = 20;
    		}
-		Robot.drivetrain.gyroDrive(speed, startingAngle-lastValidTargetCorrection);
+		Robot.driveTrainSRX.gyroDrive(speed, startingAngle-lastValidTargetCorrection);
 		waitCounter++;
    }
 
@@ -92,7 +92,7 @@ public class CameraDriveGyro extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	Robot.drivetrain.driveStop();
+    	Robot.driveTrainSRX.driveStop();
     }
 
     // Called when another command which requires one or more of the same

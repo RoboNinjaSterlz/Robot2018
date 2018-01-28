@@ -47,8 +47,8 @@ public class DriveStraightForDistance extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	lEncoderStart = Robot.drivetrain.getLeftEncoder();
-    	rEncoderStart = Robot.drivetrain.getRightEncoder();
+    	lEncoderStart = Robot.driveTrainSRX.getLeftEncoder();
+    	rEncoderStart = Robot.driveTrainSRX.getRightEncoder();
     	startingAngle = Robot.gyro.getAngle();
     	waitCounter = 0;
     	//Robot.gyro.reset();
@@ -57,15 +57,15 @@ public class DriveStraightForDistance extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	//Robot.drivetrain.arcadeDrive(Robot.oi.driveRight.getY(), 0);
+    	//Robot.driveTrainSRX.arcadeDrive(Robot.oi.driveRight.getY(), 0);
     	waitCounter++;
-    	Robot.drivetrain.gyroDrive(m_speed, startingAngle);
+    	Robot.driveTrainSRX.gyroDrive(m_speed, startingAngle);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	boolean done = false;
-    	done = (m_distance <= Math.abs((Robot.drivetrain.getRightEncoder() - rEncoderStart)));
+    	done = (m_distance <= Math.abs((Robot.driveTrainSRX.getRightEncoder() - rEncoderStart)));
     	if (!done) {
     		done = (waitCounter >= (int)(TIMEOUT/DELAYPERCOUNT));
     	}
@@ -74,7 +74,7 @@ public class DriveStraightForDistance extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    	Robot.drivetrain.driveStop();
+    	Robot.driveTrainSRX.driveStop();
 
     }
 
