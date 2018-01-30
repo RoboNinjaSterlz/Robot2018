@@ -84,9 +84,13 @@ public class CurrentMonitor extends Subsystem {
     	    }
     	}
     	SmartDashboard.putNumber("Fail count 9", currentStatus[9].failCount);
-    	SmartDashboard.putNumber("0 Current", powerDistributionPanel1.getCurrent(0));
     	SmartDashboard.putNumber("Fail count 11", currentStatus[11].failCount);
-    	SmartDashboard.putNumber("14 Current", powerDistributionPanel1.getCurrent(14));
+    	SmartDashboard.putNumber("Right1 Current", powerDistributionPanel1.getCurrent(14));
+    	SmartDashboard.putNumber("Right2 Current", powerDistributionPanel1.getCurrent(13));
+    	SmartDashboard.putNumber("Right3 Current", powerDistributionPanel1.getCurrent(1));
+    	SmartDashboard.putNumber("Left1 Current", powerDistributionPanel1.getCurrent(0));
+    	SmartDashboard.putNumber("Left2 Current", powerDistributionPanel1.getCurrent(2));
+    	SmartDashboard.putNumber("Left3 Current", powerDistributionPanel1.getCurrent(3));
     }
     		
     public void driveTrainCurrentReport(double leftThrottle, double rightThrottle) {
