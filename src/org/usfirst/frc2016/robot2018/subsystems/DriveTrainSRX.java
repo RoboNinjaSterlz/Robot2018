@@ -81,7 +81,7 @@ public class DriveTrainSRX extends Subsystem {
 
 
    public DriveTrainSRX() {
-   	talonDriveLeft1.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
+   	talonDriveLeft1.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative , 0, 0);
    	talonDriveLeft1.setSensorPhase(true); //!!!! Check this !!!!!
    	talonDriveLeft1.setInverted(false);
    	talonDriveLeft1.configAllowableClosedloopError(0, 0, 0);
@@ -95,8 +95,8 @@ public class DriveTrainSRX extends Subsystem {
    	talonDriveLeft1.setNeutralMode(NeutralMode.Brake);
    	talonDriveLeft1.set(ControlMode.PercentOutput, 0);
    
-   	talonDriveLeft2.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
-   	talonDriveLeft2.setSensorPhase(true); //!!!! Check this !!!!!
+//   	talonDriveLeft2.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
+//   	talonDriveLeft2.setSensorPhase(true); //!!!! Check this !!!!!
    	talonDriveLeft2.setInverted(false);
    	talonDriveLeft2.configAllowableClosedloopError(0, 0, 0);
    	talonDriveLeft2.configForwardLimitSwitchSource(
@@ -109,8 +109,8 @@ public class DriveTrainSRX extends Subsystem {
    	talonDriveLeft2.setNeutralMode(NeutralMode.Brake);
    	talonDriveLeft2.set(ControlMode.Follower, 0);
    	
-   	talonDriveLeft3.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
-   	talonDriveLeft3.setSensorPhase(true); //!!!! Check this !!!!!
+//   	talonDriveLeft3.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
+//   	talonDriveLeft3.setSensorPhase(true); //!!!! Check this !!!!!
    	talonDriveLeft3.setInverted(false);
    	talonDriveLeft3.configAllowableClosedloopError(0, 0, 0);
    	talonDriveLeft3.configForwardLimitSwitchSource(
@@ -123,7 +123,7 @@ public class DriveTrainSRX extends Subsystem {
    	talonDriveLeft3.setNeutralMode(NeutralMode.Brake);
    	talonDriveLeft3.set(ControlMode.Follower, 0);
 
-   	talonDriveRight1.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
+   	talonDriveRight1.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative , 0, 0);
    	talonDriveRight1.setSensorPhase(true); //!!!! Check this !!!!!
    	talonDriveRight1.setInverted(true);
    	talonDriveRight1.configAllowableClosedloopError(0, 0, 0);
@@ -137,8 +137,8 @@ public class DriveTrainSRX extends Subsystem {
    	talonDriveRight1.setNeutralMode(NeutralMode.Brake);
    	talonDriveRight1.set(ControlMode.PercentOutput, 0);
 
-   	talonDriveRight2.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
-   	talonDriveRight2.setSensorPhase(true); //!!!! Check this !!!!!
+//   	talonDriveRight2.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
+//   	talonDriveRight2.setSensorPhase(true); //!!!! Check this !!!!!
    	talonDriveRight2.setInverted(true);
    	talonDriveRight2.configAllowableClosedloopError(0, 0, 0);
    	talonDriveRight2.configForwardLimitSwitchSource(
@@ -151,8 +151,8 @@ public class DriveTrainSRX extends Subsystem {
    	talonDriveRight2.setNeutralMode(NeutralMode.Brake);
    	talonDriveRight2.set(ControlMode.Follower, 3);
 
-   	talonDriveRight3.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
-   	talonDriveRight3.setSensorPhase(true); //!!!! Check this !!!!!
+//   	talonDriveRight3.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder , 0, 0);
+//   	talonDriveRight3.setSensorPhase(true); //!!!! Check this !!!!!
    	talonDriveRight3.setInverted(true);
    	talonDriveRight3.configAllowableClosedloopError(0, 0, 0);
    	talonDriveRight3.configForwardLimitSwitchSource(
@@ -293,9 +293,10 @@ public class DriveTrainSRX extends Subsystem {
         leftCurrentSpeed = returnRamp(leftCurrentSpeed, leftY);
         rightCurrentSpeed = returnRamp(rightCurrentSpeed, rightY);
         //SmartDashboard.putNumber("LJoyY", letfY);
-        //SmartDashboard.putNumber("LCurrentSpeed", leftCurrentSpeed);
+        SmartDashboard.putNumber("LSpeed", leftCurrentSpeed);
 //    	robotDrive.tankDrive(leftCurrentSpeed, rightCurrentSpeed);
     	differentialDrive.tankDrive(-leftCurrentSpeed, rightCurrentSpeed, true);
+    	
     }	
     
     public void driveStop() {
