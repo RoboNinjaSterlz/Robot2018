@@ -294,6 +294,7 @@ public class DriveTrainSRX extends Subsystem {
         rightCurrentSpeed = returnRamp(rightCurrentSpeed, rightY);
         //SmartDashboard.putNumber("LJoyY", letfY);
         SmartDashboard.putNumber("LSpeed", leftCurrentSpeed);
+        SmartDashboard.putNumber("RSpeed", rightCurrentSpeed);
 //    	robotDrive.tankDrive(leftCurrentSpeed, rightCurrentSpeed);
     	differentialDrive.tankDrive(-leftCurrentSpeed, rightCurrentSpeed, true);
     	
