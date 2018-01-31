@@ -89,8 +89,8 @@ public class CurrentMonitor extends Subsystem {
     	SmartDashboard.putNumber("Right2 Current", powerDistributionPanel1.getCurrent(13));
     	SmartDashboard.putNumber("Right3 Current", powerDistributionPanel1.getCurrent(1));
     	SmartDashboard.putNumber("Left1 Current", powerDistributionPanel1.getCurrent(0));
-    	SmartDashboard.putNumber("Left2 Current", powerDistributionPanel1.getCurrent(2));
-    	SmartDashboard.putNumber("Left3 Current", powerDistributionPanel1.getCurrent(3));
+    	SmartDashboard.putNumber("Left2 Current", powerDistributionPanel1.getCurrent(3));
+    	SmartDashboard.putNumber("Left3 Current", powerDistributionPanel1.getCurrent(2));
     }
     		
     public void driveTrainCurrentReport(double leftThrottle, double rightThrottle) {
