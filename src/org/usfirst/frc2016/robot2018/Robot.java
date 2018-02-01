@@ -120,8 +120,8 @@ public class Robot extends TimedRobot {
 		calAttemptTimer = 0;
 		calTimerExpired = false;
 
-		camServer = CameraServer.getInstance();
-		frontCamera=camServer.startAutomaticCapture("Switcher", 0);
+//		camServer = CameraServer.getInstance();
+//		frontCamera=camServer.startAutomaticCapture("Switcher", 0);
 		// 0 being the port of the camera
 /*		frontCamera = new UsbCamera("Front",0);
 		//        rearCamera = new UsbCamera("Rear", 1);
