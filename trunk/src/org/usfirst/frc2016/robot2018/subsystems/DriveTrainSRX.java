@@ -215,7 +215,7 @@ public class DriveTrainSRX extends Subsystem {
 			System.out.println(_sb.toString());
 		}
 		_sb.setLength(0);
-		differentialDrive.tankDrive(0,0);
+		//differentialDrive.tankDrive(0,0);
 	}
 
 		
@@ -338,8 +338,8 @@ public class DriveTrainSRX extends Subsystem {
     	double leftY;
     	//if (Robot.frontCameraActive) {
 //    		rightY= adjustDriveValue(rightJoy.getY());
-    		rightY= adjustDriveValue(leftJoy.getRawAxis(5));
-    		leftY = adjustDriveValue(leftJoy.getY());
+    		rightY= leftJoy.getRawAxis(5);
+    		leftY = leftJoy.getY();
     	//}
     	//else {
     	//	leftY= -adjustDriveValue(rightJoy.getY());
@@ -383,7 +383,6 @@ public class DriveTrainSRX extends Subsystem {
             leftY = RobotMain.drivetrainVoltageLimit;
         }
         */
-        
         // Fix the sign
         if (ltz) {
             joyY *= -1;
