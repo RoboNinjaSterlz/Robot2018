@@ -77,6 +77,13 @@ public class Gyro extends Subsystem {
     	SmartDashboard.putNumber("Roll",navxGyro.getRoll() );
     }
     
+    public void addTelemetryHeaders() {
+
+    }	
+
+    public void writeTelemetry() {
+    	
+    }
     public void calibrate() {
     	//imu.calibrate();
     	//gGyro.calibrate();
