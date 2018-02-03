@@ -1,6 +1,8 @@
 package org.usfirst.frc2016.robot2018;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +63,9 @@ public class LCTelemetry {
     public final int ki_MaxRows 	= 50  * 60 * 3; 	/** Default 9000: 50 times per second * 60 seconds * 3 minutes */
 
     private String s_TelemType = "new";
+    
+    private DateFormat dateFormat;
+    private Calendar cal;
 
 
 	/** Class Contructor initialize you variables here. 
@@ -79,6 +84,8 @@ public class LCTelemetry {
         bp_TimestampFile =  true;
         sp_FilePath = "/var/volatile/tmp";					/** /var/volatile/tmp folder. Lost after reboot, /home/lvuser is writable.*/
         sp_FileName = "telemetry";
+        dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        cal = Calendar.getInstance();
         
         createNewList();
  
@@ -315,9 +322,9 @@ public class LCTelemetry {
         listColumnData[i_TotalColumns++] =						// Save the Telemetry generated columns first in the proper order, notice increment  
         			String.format( "%.2f", tim_Time.get() );
         
-        listColumnData[i_TotalColumns++] =						
-    			String.format( "%.2f", tim_Time.get() );
-
+        listColumnData[i_TotalColumns++] = dateFormat.format(cal.getTime());						
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+        
         listColumnData[i_TotalColumns++] = 
         			String.format( "%.2f", RobotController.getBatteryVoltage() );
         
