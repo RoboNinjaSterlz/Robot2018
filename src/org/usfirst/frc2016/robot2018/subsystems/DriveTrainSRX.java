@@ -158,16 +158,24 @@ public class DriveTrainSRX extends Subsystem {
    	talonDriveRight3.setIntegralAccumulator(0, 0, 0);
    	talonDriveRight3.setNeutralMode(NeutralMode.Brake);
    	talonDriveRight3.set(ControlMode.Follower, 3);
-   
+   	
    }
    
    
    public void periodic() {
-	   Robot.currentMonitor.driveTrainCurrentReport(talonDriveLeft1.getMotorOutputVoltage(), talonDriveRight1.getMotorOutputVoltage());
     }
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
+   
+   public void addTelemetryHeaders() {
+	   	Robot.currentMonitor.registerMonitorDevive(talonDriveLeft1, "Drive Left 1");
+	   	Robot.currentMonitor.registerMonitorDevive(talonDriveLeft2, "Drive Left 2");
+	   	Robot.currentMonitor.registerMonitorDevive(talonDriveLeft3, "Drive Left 3");
+	   	Robot.currentMonitor.registerMonitorDevive(talonDriveRight1, "Drive Right 1");
+	   	Robot.currentMonitor.registerMonitorDevive(talonDriveRight2, "Drive Right 2");
+	   	Robot.currentMonitor.registerMonitorDevive(talonDriveRight3, "Drive Right 3");
+   }
    
    public void gameVelocityDrive(Joystick joy) {
 	   final double MAX_SPEED = 2000;
