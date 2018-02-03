@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -75,7 +76,7 @@ public class LCTelemetry {
         listColumns = new String[ki_MaxColumns];
         dictColumnData = new HashMap<String, String>();
         driverStation = DriverStation.getInstance();
-        bp_TimestampFile =  false;
+        bp_TimestampFile =  true;
         sp_FilePath = "/var/volatile/tmp";					/** /var/volatile/tmp folder. Lost after reboot, /home/lvuser is writable.*/
         sp_FileName = "telemetry";
         
@@ -314,8 +315,17 @@ public class LCTelemetry {
         listColumnData[i_TotalColumns++] =						// Save the Telemetry generated columns first in the proper order, notice increment  
         			String.format( "%.2f", tim_Time.get() );
         
+        listColumnData[i_TotalColumns++] =						
+    			String.format( "%.2f", tim_Time.get() );
+
         listColumnData[i_TotalColumns++] = 
-        			String.format( "%.2f", driverStation.getBatteryVoltage() );
+        			String.format( "%.2f", RobotController.getBatteryVoltage() );
+        
+        String s_Brownout = "";
+        if (RobotController.isBrownedOut()) {
+        	s_Brownout = "True";
+        }
+        listColumnData[i_TotalColumns++] = s_Brownout;
 
         String s_Mode = "";
         
@@ -382,7 +392,7 @@ public class LCTelemetry {
     	
         this.sp_FileName = config.getString("Tele_FileName", "telemetry");
         this.sp_FilePath = config.getString("Tele_FilePath", "/tmp"); 
-        this.bp_TimestampFile = config.getBoolean("Tele_TimestampFile", false);
+        this.bp_TimestampFile = config.getBoolean("Tele_TimestampFile", true);
         
     }
  
@@ -406,7 +416,7 @@ public class LCTelemetry {
     	if(this.bp_TimestampFile==true)
     		s_FullFileName += "_" +  new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 
-    	s_FullFileName += ".xls";										// .xls makes it look like an Excel spread spread
+    	s_FullFileName += ".csv";										// .xls makes it look like an Excel spread spread
 
     	return s_FullFileName;
     }
@@ -469,7 +479,7 @@ public class LCTelemetry {
         try {
 			fileHandle = new FileWriter( getFileName() );
 
-			String headerRow = "Timer\tBatt Volts\tMode\t";			// these are common fields LCTelemetry adds
+			String headerRow = "Timer\tBatt Volts\tMode\tDate Time\tBrown out\t";			// these are common fields LCTelemetry adds
 			
             for (int i = 0; listColumns[i] != null; i++) {
             	headerRow += listColumns[i] + '\t';					// the \t inserts a tab character easily read as a column in excel. 

@@ -28,10 +28,9 @@ public class RobotPrefs {
 	// This is used to see if the operator wants to load new values from
 	// the RobRio NVRAM. If so robotPrefs class will perform the operation.
 	public void periodic() {
-/*		if (Robot.oi.operatorJoy.getRawButton(RobotMap.PREFS_BUTTON)) {
+		if (Robot.oi.operatorJoy.getRawButton(RobotMap.PREFS_BUTTON)) {
 			doLoadPrefs();
 		}
-		*/
 	}
 	// Read the values stored in NV RAM and store them in variables
  public	void doLoadPrefs() {
@@ -43,12 +42,6 @@ public class RobotPrefs {
 		 *  The call to setMax will update the limit.
 		 */
 
-		// Straight Gear 
-		straightGearSpeed = 
-				prefs.getDouble("StraightGearSpeed", Defaults.STRAIGHTGEARSPEED);
-		straightGearDistance = 
-				prefs.getDouble("StraightGearDistance" , Defaults.STRAIGHTGEARDISTANCE);
-
 		
 		/*
  		Robot.highGoalShooter.presetSpeed[2] = 
@@ -58,6 +51,8 @@ public class RobotPrefs {
 */
 		Robot.driveTrainSRX.drivetrainVoltageLimit = prefs.getDouble("drivetrainVoltageLimit", Defaults.DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT);
         Robot.driveTrainSRX.setMax();
+		Robot.cubePickup.wheelSpeed = prefs.getDouble("cubeWheelSpeed0", Defaults.CUBE_WHEEL_SPEED0);
+        Robot.driveTrainSRX.setMax();
 	}
 
 
@@ -66,18 +61,11 @@ public class RobotPrefs {
 		//Setup the nv RAM in the Roborio
 		prefs = Preferences.getInstance();
 		
-		
-		// Straight Gear Placement
-		if (!prefs.containsKey("StraightGearSpeed")) {
-			prefs.putDouble("StraightGearSpeed", Defaults.STRAIGHTGEARSPEED);
-		}
-		if (!prefs.containsKey("StraightGearDistance")) {
-			prefs.putDouble("StraightGearDistance", Defaults.STRAIGHTGEARDISTANCE);
-		}
-		
-		
 		if (!prefs.containsKey("drivetrainVoltageLimit")) {
 			prefs.putDouble("drivetrainVoltageLimit", Defaults.DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT);
+		}
+		if (!prefs.containsKey("CubeWheelSpeed0")) {
+			prefs.putDouble("CubeWheelSpeed0", Defaults.CUBE_WHEEL_SPEED0);
 		}
 	}
 }

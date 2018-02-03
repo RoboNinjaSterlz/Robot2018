@@ -40,7 +40,7 @@ public class Winch extends Subsystem {
     // here. Call these from Commands.
 
     public void periodic() {
-    	Robot.currentMonitor.winchCurrentReport(winchSpark.get());
+//    	Robot.currentMonitor.winchCurrentReport(winchSpark.get());
     }
     public void lift()
     {

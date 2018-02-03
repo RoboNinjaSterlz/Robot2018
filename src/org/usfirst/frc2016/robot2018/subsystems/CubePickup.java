@@ -96,10 +96,6 @@ public class CubePickup extends Subsystem {
 	   talonCubeWheelRight.setIntegralAccumulator(0, 0, 0);
 	   talonCubeWheelRight.setNeutralMode(NeutralMode.Brake);
 	   talonCubeWheelRight.set(ControlMode.PercentOutput, 0);
-	   
-	   Robot.currentMonitor.registerMonitorDevive(talonCubeWheelLeft, "Cube Wheel Left");
-	   Robot.currentMonitor.registerMonitorDevive(talonCubeWheelRight, "Cube Wheel Right");
-
 	}
 	
     @Override
@@ -135,7 +131,7 @@ public class CubePickup extends Subsystem {
 		 * POV is pressed forward, cause the tote to move away from the bot.
 		 */
 		case 0:
-			leftWheel = -wheelSpeed;
+			leftWheel =  wheelSpeed;
 			rightWheel = wheelSpeed;
 			break;
 		
@@ -143,7 +139,7 @@ public class CubePickup extends Subsystem {
 		 * POV is to the right, rotate the tote clockwise.
 		 */
 		case 90:
-			leftWheel = -wheelSpeed;
+			leftWheel =   wheelSpeed;
 			rightWheel = -wheelSpeed;
 			break;
 			
@@ -151,7 +147,7 @@ public class CubePickup extends Subsystem {
 		 * POV is back, cause the tote to move toward the bot.
 		 */
 		case 180:
-			leftWheel = wheelSpeed;
+			leftWheel =  -wheelSpeed;
 			rightWheel = -wheelSpeed;
 			break;
 			
@@ -159,8 +155,8 @@ public class CubePickup extends Subsystem {
 			 * POV is to the left, rotate the tote counter clockwise.
 			 */
 		case 270:
-			leftWheel = wheelSpeed;
-			rightWheel = wheelSpeed;
+			leftWheel =  -wheelSpeed;
+			rightWheel =  wheelSpeed;
 			break;
 
 		/*
