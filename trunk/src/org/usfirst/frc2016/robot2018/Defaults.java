@@ -28,9 +28,9 @@ public class Defaults {
     protected static final double AUT_LEFT_Y = .8;
 
 // Elevator presets
-    protected static final double ELEVATORPOSITION1 = 0;
-    protected static final double ELEVATORPOSITION2 = 1000;
-    protected static final double ELEVATORPOSITION3 = 7000;
+    protected static final double ARMPOSITION1 = 0;
+    protected static final double ARMPOSITION2 = 1000;
+    protected static final double ARMPOSITION3 = 7000;
     
 
 // Wheel Speeds
