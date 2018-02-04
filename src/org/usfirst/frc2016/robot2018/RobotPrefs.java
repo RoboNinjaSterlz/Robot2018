@@ -42,7 +42,12 @@ public class RobotPrefs {
 		 *  The call to setMax will update the limit.
 		 */
 
-		
+		Robot.arm.presetPositions[Robot.arm.LOW] = 
+				prefs.getDouble("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.LOW], Defaults.ARMPOSITION1);
+		Robot.arm.presetPositions[Robot.arm.MEDIUM] = 
+				prefs.getDouble("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.MEDIUM], Defaults.ARMPOSITION2);
+		Robot.arm.presetPositions[Robot.arm.HIGH] = 
+				prefs.getDouble("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.HIGH], Defaults.ARMPOSITION3);
 		/*
  		Robot.highGoalShooter.presetSpeed[2] = 
 				prefs.getDouble("Wheel "+Robot.highGoalShooter.WheelSpeedLabels[2], Defaults.WHEEL_SPEED2);
@@ -51,7 +56,7 @@ public class RobotPrefs {
 */
 		Robot.driveTrainSRX.drivetrainVoltageLimit = prefs.getDouble("drivetrainVoltageLimit", Defaults.DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT);
         Robot.driveTrainSRX.setMax();
-		Robot.cubePickup.wheelSpeed = prefs.getDouble("cubeWheelSpeed0", Defaults.CUBE_WHEEL_SPEED0);
+		Robot.cubePickup.wheelSpeed = prefs.getDouble("CubeWheelSpeed0", Defaults.CUBE_WHEEL_SPEED0);
         Robot.driveTrainSRX.setMax();
 	}
 
@@ -66,6 +71,15 @@ public class RobotPrefs {
 		}
 		if (!prefs.containsKey("CubeWheelSpeed0")) {
 			prefs.putDouble("CubeWheelSpeed0", Defaults.CUBE_WHEEL_SPEED0);
+		}
+		if (!prefs.containsKey("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.LOW])) {
+			prefs.putDouble("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.LOW], Defaults.ARMPOSITION1);
+		}
+		if (!prefs.containsKey("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.MEDIUM]))  {	
+			prefs.putDouble("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.MEDIUM], Defaults.ARMPOSITION2);
+		}
+		if (!prefs.containsKey("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.HIGH]))  {	
+			prefs.putDouble("Arm "+Robot.arm.ArmPositionLabels[Robot.arm.HIGH], Defaults.ARMPOSITION3);
 		}
 	}
 }
