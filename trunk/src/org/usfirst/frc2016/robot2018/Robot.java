@@ -272,8 +272,9 @@ public class Robot extends TimedRobot {
 	private void writeTelem() {
 //		currentMonitor.periodic();
 		cubePickup.writeTelemetyValues();
-		gyro.writeTelemetry();
+		gyro.writeTelemetry(); // remember to do Gyro
 		driveTrainSRX.writeTelemetry();
+		arm.writeTelemetyValues();
 		telem.writeRow();
 	}
 	
