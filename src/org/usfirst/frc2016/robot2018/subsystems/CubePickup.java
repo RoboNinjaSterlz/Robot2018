@@ -71,7 +71,7 @@ public class CubePickup extends Subsystem {
 
 		talonCubeWheelLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative , 0, 0);
 	   	talonCubeWheelLeft.setSensorPhase(true); //!!!! Check this !!!!!
-	   	talonCubeWheelLeft.setInverted(false);
+	   	talonCubeWheelLeft.setInverted(true);
 	   	talonCubeWheelLeft.configAllowableClosedloopError(0, 0, 0);
 	   	talonCubeWheelLeft.configForwardLimitSwitchSource(
 	   			LimitSwitchSource.FeedbackConnector,
