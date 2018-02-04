@@ -72,7 +72,9 @@ public class DriveTrainSRX extends Subsystem {
 	private double leftCurrentSpeed = 0;
 	private double rightCurrentSpeed = 0;
 	
-    /*
+	private double lastJoyLeft, lastJoyRight;
+	private String lastDriveMode;
+	/*
      * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      * End of values set by RobotPrefs
      */
@@ -175,6 +177,15 @@ public class DriveTrainSRX extends Subsystem {
 	   	Robot.currentMonitor.registerMonitorDevive(talonDriveRight1, "Drive Right 1");
 	   	Robot.currentMonitor.registerMonitorDevive(talonDriveRight2, "Drive Right 2");
 	   	Robot.currentMonitor.registerMonitorDevive(talonDriveRight3, "Drive Right 3");
+	   	Robot.telem.addColumn("Drive Left");
+	   	Robot.telem.addColumn("Drive Right");
+	   	Robot.telem.addColumn("Drive Mode");
+   }
+   
+   public void writeTelemetry() {
+	   Robot.telem.saveDouble("Drive Left", lastJoyLeft);
+	   Robot.telem.saveDouble("Drive Right", lastJoyRight);
+	   Robot.telem.saveString("Drive Mode", lastDriveMode);
    }
    
    public void gameVelocityDrive(Joystick joy) {
@@ -232,6 +243,9 @@ public class DriveTrainSRX extends Subsystem {
     public void arcadeDrive(Joystick joy) {
 //    	robotDrive.arcadeDrive(joy, true);
     	differentialDrive.arcadeDrive(joy.getY(), joy.getX(), true);
+    	lastJoyLeft = joy.getY();
+    	lastJoyRight = joy.getX();
+    	lastDriveMode = "ArcadeJoy";
     }
     
     public void arcadeDrive(Joystick leftJoy, Joystick rightJoy) {
@@ -242,6 +256,9 @@ public class DriveTrainSRX extends Subsystem {
 //    		rightY= adjustDriveValue(rightJoy.getY());
     		rightY= adjustDriveValue(leftJoy.getRawAxis(4));
     		leftY = adjustDriveValue(leftJoy.getY());
+        	lastJoyLeft = leftY;
+        	lastJoyRight = rightY;
+        	lastDriveMode = "ArcadeJoy";
     	//}
     	//else {
     	//	leftY= -adjustDriveValue(rightJoy.getY());
@@ -258,6 +275,10 @@ public class DriveTrainSRX extends Subsystem {
     public void arcadeDrive(double speed, double direction) {
 //    	robotDrive.arcadeDrive(speed, direction);
 		velocityDrive(speed, direction);
+    	lastJoyLeft = speed;
+    	lastJoyRight = direction;
+    	lastDriveMode = "Arcade";
+
     }
     
     public void gyroDrive(double speed, double angle) {
@@ -286,6 +307,10 @@ public class DriveTrainSRX extends Subsystem {
     	else {
 //    		Robot.drivetrain.arcadeDrive(speed, steer);
     		velocityDrive(speed, steer);
+        	lastJoyLeft = speed;
+        	lastJoyRight = steer;
+        	lastDriveMode = "Gyro";
+
     	}
     }
     
@@ -321,6 +346,10 @@ public class DriveTrainSRX extends Subsystem {
     	}
 //    	robotDrive.arcadeDrive(finalSpeed, direction);
     	differentialDrive.arcadeDrive(finalSpeed, direction);
+    	lastJoyLeft = finalSpeed;
+    	lastJoyRight = direction;
+    	lastDriveMode = "Velocity";
+
     }
     
     public double getAverageRate() {
@@ -336,15 +365,12 @@ public class DriveTrainSRX extends Subsystem {
     	accumSpeed = 0;
     	double rightY;
     	double leftY;
-    	//if (Robot.frontCameraActive) {
-//    		rightY= adjustDriveValue(rightJoy.getY());
-    		rightY= leftJoy.getRawAxis(5);
-    		leftY = leftJoy.getY();
-    	//}
-    	//else {
-    	//	leftY= -adjustDriveValue(rightJoy.getY());
-    	//	rightY = -adjustDriveValue(leftJoy.getY());
-    	//}
+    	rightY= leftJoy.getRawAxis(5);
+    	leftY = leftJoy.getY();
+    	lastJoyLeft = leftY;
+    	lastJoyRight = rightY;
+    	lastDriveMode = "Tank";
+
         // The values to pass to the motors are adjusted by the ramp method
         leftCurrentSpeed = returnRamp(leftCurrentSpeed, leftY);
         rightCurrentSpeed = returnRamp(rightCurrentSpeed, rightY);
