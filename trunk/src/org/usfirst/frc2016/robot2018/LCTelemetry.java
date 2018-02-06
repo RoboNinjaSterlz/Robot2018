@@ -486,7 +486,7 @@ public class LCTelemetry {
         try {
 			fileHandle = new FileWriter( getFileName() );
 
-			String headerRow = "Timer\tBatt Volts\tMode\tDate Time\tBrown out\t";			// these are common fields LCTelemetry adds
+			String headerRow = "Timer\tDate Time\tBatt Volts\tBrown Out\tMode\t";			// these are common fields LCTelemetry adds
 			
             for (int i = 0; listColumns[i] != null; i++) {
             	headerRow += listColumns[i] + '\t';					// the \t inserts a tab character easily read as a column in excel. 
