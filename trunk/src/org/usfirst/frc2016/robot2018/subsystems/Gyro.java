@@ -11,12 +11,12 @@
 
 package org.usfirst.frc2016.robot2018.subsystems;
 
-import org.usfirst.frc2016.robot2018.RobotMap;
+import org.usfirst.frc2016.robot2018.Robot;
+
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -28,6 +28,8 @@ public class Gyro extends Subsystem {
 	
 	public final double gyroP = 0.09;
 	public final double TURN_MAX = 0.6;
+	private final String GYRO_ANGLE = "Gyro Angle";
+	private final String GYRO_ROLL = "Gyro Roll";
 
 	//ADIS16448_IMU imu;
 	//XRS450_Gyro digGyro;
@@ -68,8 +70,6 @@ public class Gyro extends Subsystem {
     	 */
     }
     
-    
-    
     public void periodic() {
         //SmartDashboard.putData("IMU", imu);
     	//artDashboard.putNumber("Gyro Heading", digGyro.getAngle());
@@ -78,11 +78,13 @@ public class Gyro extends Subsystem {
     }
     
     public void addTelemetryHeaders() {
-
+    	Robot.telem.addColumn(GYRO_ANGLE);
+    	Robot.telem.addColumn(GYRO_ROLL);
     }	
 
     public void writeTelemetry() {
-    	
+    	Robot.telem.saveDouble(GYRO_ANGLE, getAngle());
+    	Robot.telem.saveDouble(GYRO_ROLL, getRoll());
     }
     public void calibrate() {
     	//imu.calibrate();
