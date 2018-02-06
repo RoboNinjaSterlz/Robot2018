@@ -369,7 +369,7 @@ public class LCTelemetry {
             listColumnData[i_TotalColumns++] = "";				// if we did not do this then the word null would show up for all the extra columns
         														// this extra data is annoying but is the price we pay for speed. 
         
-        listRows[this.i_TotalRows++] = String.join("\t", listColumnData);	// save this row to the row list 
+        listRows[this.i_TotalRows++] = String.join(",", listColumnData);	// save this row to the row list 
         																	// This is why we use the array listColumnData. Using the join method to save to the 
         																	// list of rows is very, very fast and does not use any robot cycles. 
         																	// we still run at 50 cycles per second. Other methods we use in development
@@ -486,10 +486,10 @@ public class LCTelemetry {
         try {
 			fileHandle = new FileWriter( getFileName() );
 
-			String headerRow = "Timer\tDate Time\tBatt Volts\tBrown Out\tMode\t";			// these are common fields LCTelemetry adds
+			String headerRow = "Timer,Date Time,Batt Volts,Brown Out,Mode,";			// these are common fields LCTelemetry adds
 			
             for (int i = 0; listColumns[i] != null; i++) {
-            	headerRow += listColumns[i] + '\t';					// the \t inserts a tab character easily read as a column in excel. 
+            	headerRow += listColumns[i] + ',';					// the , inserts a comma character easily read as a column in excel. 
             }
             
         	fileHandle.write(headerRow + "\n");						// write the header. the \n is a new line indicating the end of a line or row in the sheet. 
