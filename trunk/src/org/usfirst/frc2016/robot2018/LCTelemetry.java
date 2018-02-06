@@ -322,12 +322,31 @@ public class LCTelemetry {
         listColumnData[i_TotalColumns++] =						// Save the Telemetry generated columns first in the proper order, notice increment  
         			String.format( "%.2f", tim_Time.get() );
         
-        listColumnData[i_TotalColumns++] = dateFormat.format(cal.getTime());						
+        listColumnData[i_TotalColumns++] =
+        			dateFormat.format(cal.getTime());						
 //        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
         
         listColumnData[i_TotalColumns++] = 
-        			String.format( "%.2f", RobotController.getBatteryVoltage() );
+        			driverStation.getEventName();
         
+        DriverStation.MatchType matchType = driverStation.getMatchType();
+        String s_matchType = "";
+        if (matchType == DriverStation.MatchType.Elimination)
+        	s_matchType="Elimination";
+        else if(matchType == DriverStation.MatchType.None)
+        	s_matchType = "None";
+        else if (matchType == DriverStation.MatchType.Practice)
+        	s_matchType = "Practice";
+        else if (matchType == DriverStation.MatchType.Qualification)
+        	s_matchType = "Qualification";
+        listColumnData[i_TotalColumns++] = s_matchType; 
+
+        listColumnData[i_TotalColumns++] = 
+    			Integer.toString(driverStation.getMatchNumber());
+
+        listColumnData[i_TotalColumns++] = 
+    			String.format( "%.2f", RobotController.getBatteryVoltage() );
+
         String s_Brownout = "";
         if (RobotController.isBrownedOut()) {
         	s_Brownout = "True";
@@ -486,7 +505,7 @@ public class LCTelemetry {
         try {
 			fileHandle = new FileWriter( getFileName() );
 
-			String headerRow = "Timer,Date Time,Batt Volts,Brown Out,Mode,";			// these are common fields LCTelemetry adds
+			String headerRow = "Timer,Date Time,Event,Match Type,Match Number,Batt Volts,Brown Out,Mode,";			// these are common fields LCTelemetry adds
 			
             for (int i = 0; listColumns[i] != null; i++) {
             	headerRow += listColumns[i] + ',';					// the , inserts a comma character easily read as a column in excel. 
