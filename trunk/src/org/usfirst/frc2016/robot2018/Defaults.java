@@ -28,7 +28,7 @@ public class Defaults {
     protected static final double AUT_LEFT_Y = .8;
 
 // Elevator presets
-    protected static final double ARMPOSITION1 = 0;
+    protected static final double ARMPOSITION1 = 550;
     protected static final double ARMPOSITION2 = 1000;
     protected static final double ARMPOSITION3 = 7000;
     

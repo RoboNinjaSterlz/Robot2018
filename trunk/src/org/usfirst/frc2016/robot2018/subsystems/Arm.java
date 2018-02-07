@@ -82,10 +82,9 @@ private boolean didWeMove=true;
 
     public Arm() {
     	presetPositions[MEDIUM]=1500;
-    	needsCalibrate = true;
     	armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute , 0, 0);
     	armTalon.setSensorPhase(true); //!!!! Check this !!!!!
-    	armTalon.setInverted(false);
+    	armTalon.setInverted(true);
     	armTalon.configAllowableClosedloopError(0, 0, 0);
     	// Keep off until we are calibrated.
     	// Hard limits should protect everything.
@@ -95,14 +94,15 @@ private boolean didWeMove=true;
     	armTalon.configReverseLimitSwitchSource(
     			LimitSwitchSource.FeedbackConnector,
     			LimitSwitchNormal.NormallyOpen, 0);
-    	armTalon.configForwardSoftLimitThreshold(0, 0);
-    	armTalon.configForwardSoftLimitEnable(false, 0);
-    	armTalon.configReverseSoftLimitThreshold(2500, 0);
-    	armTalon.configReverseSoftLimitEnable(false, 0);
+    	armTalon.configForwardSoftLimitThreshold(4022, 0);
+    	armTalon.configForwardSoftLimitEnable(true, 0);
+    	armTalon.configReverseSoftLimitThreshold(2210, 0);
+    	armTalon.configReverseSoftLimitEnable(true, 0);
     	armTalon.clearStickyFaults(0);
     	armTalon.setIntegralAccumulator(0, 0, 0);
     	armTalon.setNeutralMode(NeutralMode.Brake);
-    	armTalon.set(ControlMode.Position, presetPositions[HIGH]); 
+    	armTalon.set(ControlMode.Position, presetPositions[MEDIUM]);
+    	goToPreset(MEDIUM);
     	}
 
 
@@ -114,9 +114,7 @@ private boolean didWeMove=true;
     	// Goes to the encoder count that is passed
         public void goTo(double height) {
     		desiredPosition = height;
-    		if (Robot.robotIsCalibrated) {
-    			armTalon.set(height);
-    		}
+    			armTalon.set(ControlMode.Position, height);
     		//armTalon.enableControl();
         	}
         public void goToPreset(int position) {
@@ -189,10 +187,11 @@ private boolean didWeMove=true;
     	// mostly for debugging updates the smart dashboard with position info
     	public void periodic() {
     		SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
-    		SmartDashboard.putNumber("GearArm Position", getPosition());
-    		SmartDashboard.putNumber("GearArm Position Error", getPositionError());
+    		SmartDashboard.putNumber("Arm Position", getPosition());
+    		SmartDashboard.putNumber("Arm Position Error", getPositionError());
     		SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
-    		//SmartDashboard.putBoolean("Did Move",shooterMoved());
+    		SmartDashboard.putBoolean("Did Move",ArmMoved());
+    		SmartDashboard.putNumber("Last Arm Position", lastPreset );
 //    		SmartDashboard.putBoolean("limit sensor", shooterLowerLimit.get());
     		if (lastPreset == HIGH) {
     			double joyY = Robot.oi.operatorJoy.getY();
