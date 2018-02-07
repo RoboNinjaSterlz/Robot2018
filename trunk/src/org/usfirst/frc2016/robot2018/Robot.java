@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
 	private  String PIMode = "comeback2later";
 	private final double DELAYPERCOUNT = .02;
 	private final double CAL_TIME_LIMIT = 4;
+	private final String CONFIG_FILE_NAME = "robot.cfg";
 	private double calAttemptTimer;
 	private boolean calTimerExpired;
 	private CameraServer camServer;
@@ -54,6 +55,7 @@ public class Robot extends TimedRobot {
 	public static boolean frontCameraActive=true;
 	SendableChooser<Command> chooser = new SendableChooser<>();
 	public static LCTelemetry telem;
+	public static Config config;
 	/*
 	 * 	Motors
 	 * 		Drive train left 2 sparks Drive train
@@ -120,6 +122,7 @@ public class Robot extends TimedRobot {
 		RobotMap.init();
 		robotIsCalibrated = false;
 		robotPrefs = new RobotPrefs();
+		config = new Config(CONFIG_FILE_NAME);
 		calAttemptTimer = 0;
 		calTimerExpired = false;
 
