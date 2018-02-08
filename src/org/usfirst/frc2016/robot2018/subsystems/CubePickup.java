@@ -11,7 +11,9 @@
 
 package org.usfirst.frc2016.robot2018.subsystems;
 
+import org.usfirst.frc2016.robot2018.Defaults;
 import org.usfirst.frc2016.robot2018.Robot;
+import org.usfirst.frc2016.robot2018.Config;
 import org.usfirst.frc2016.robot2018.RobotMap;
 import org.usfirst.frc2016.robot2018.commands.*;
 
@@ -33,7 +35,16 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 
 public class CubePickup extends Subsystem {
-	public double wheelSpeed;
+	/*
+	 * Values set by config
+	 */
+    public double wheelSpeedShoot;
+    public double wheelSpeedIn;
+    public double wheelSpeedOut;
+    public double wheelSpeedRotate;
+    /* end config values */
+    
+    
 	private boolean shootCubeActive = false;
 	// Value from point of view control on joy stick.
 	public int pov;
@@ -122,8 +133,8 @@ public class CubePickup extends Subsystem {
 		// Wheel rotation logic
 		// What position is the pov stick in
 		if (shootCubeActive) {
-			leftWheel = 1;
-			rightWheel = 1;
+			leftWheel = wheelSpeedShoot;
+			rightWheel = wheelSpeedShoot;
 		}
 		else {
 			pov = Robot.oi.operatorJoy.getPOV();
@@ -140,35 +151,35 @@ public class CubePickup extends Subsystem {
 				break;
 
 				/*
-				 * POV is pressed forward, cause the tote to move away from the bot.
+				 * POV is pressed forward, cause the cube to move away from the bot.
 				 */
 			case 0:
-				leftWheel =  wheelSpeed;
-				rightWheel = wheelSpeed;
+				leftWheel =  wheelSpeedOut;
+				rightWheel = wheelSpeedOut;
 				break;
 
 				/*
-				 * POV is to the right, rotate the tote clockwise.
+				 * POV is to the right, rotate the cube clockwise.
 				 */
 			case 90:
-				leftWheel =   wheelSpeed;
-				rightWheel = -wheelSpeed;
+				leftWheel =   wheelSpeedRotate;
+				rightWheel = -wheelSpeedRotate;
 				break;
 
 				/*
-				 * POV is back, cause the tote to move toward the bot.
+				 * POV is back, cause the cube to move toward the bot.
 				 */
 			case 180:
-				leftWheel =  -wheelSpeed;
-				rightWheel = -wheelSpeed;
+				leftWheel =  -wheelSpeedIn;
+				rightWheel = -wheelSpeedIn;
 				break;
 
 				/*
-				 * POV is to the left, rotate the tote counter clockwise.
+				 * POV is to the left, rotate the cube counter clockwise.
 				 */
 			case 270:
-				leftWheel =  -wheelSpeed;
-				rightWheel =  wheelSpeed;
+				leftWheel =  -wheelSpeedRotate;
+				rightWheel =  wheelSpeedRotate;
 				break;
 
 				/*
@@ -222,6 +233,13 @@ public class CubePickup extends Subsystem {
 		Robot.telem.saveInteger(LEFTARMPOSITION, leftTalonSensors.getAnalogIn());
 		Robot.telem.saveInteger(RIGHTARMPOSITION, rightTalonSensors.getAnalogIn());
 		
+	}
+	
+	public void loadConfig(Config config) {
+	    wheelSpeedShoot = config.getDouble("CubeWheelSpeedShoot", Defaults.WHEELSPEED_SHOOT);
+	    wheelSpeedIn = config.getDouble("CubeWheelSpeedIn", Defaults.WHEELSPEED_IN);
+	    wheelSpeedOut = config.getDouble("CubeWheelSpeedOut", Defaults.WHEELSPEED_OUT);
+	    wheelSpeedRotate = config.getDouble("CubeWheelSpeedRotate", Defaults.WHEELSPEED_ROTATE);
 	}
 	public void shootCube(){
 		shootCubeActive = true;

@@ -90,7 +90,7 @@ public class Robot extends TimedRobot {
 	 */
 	//    Command autonomousCommand;
 
-	SendableChooser autoChooser;
+	private static SendableChooser autoChooser;
 
 	/*
 	 * Flag to indicate that all systems are calibrated and ready
@@ -123,6 +123,7 @@ public class Robot extends TimedRobot {
 		robotIsCalibrated = false;
 		robotPrefs = new RobotPrefs();
 		config = new Config(CONFIG_FILE_NAME);
+		loadConfig();
 		calAttemptTimer = 0;
 		calTimerExpired = false;
 
@@ -164,7 +165,7 @@ public class Robot extends TimedRobot {
 		// constructed yet. Thus, their requires() statements may grab null
 		// pointers. Bad news. Don't move it.
 		robotPrefs.setupPrefs();
-		robotPrefs.doLoadPrefs();
+//		robotPrefs.doLoadPrefs();
 		arm.goToPreset(arm.MEDIUM);
 		oi = new OI();
 		pdPanel = new PowerDistributionPanel();
@@ -237,7 +238,7 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during operator control
 	 */
 	public void teleopPeriodic() {
-		robotPrefs.periodic();
+	//	robotPrefs.periodic();
 		if (!robotIsCalibrated) {
 			calibrateRobot();
 		}
@@ -288,6 +289,12 @@ public class Robot extends TimedRobot {
 		telem.writeRow();
 	}
 
+	private void loadConfig() {
+		arm.loadConfig(config);
+		cubePickup.loadConfig(config);
+		driveTrainSRX.loadConfig(config);
+	}
+	
 	private void updateDashboard() {
 		SmartDashboard.putBoolean("Robot Calibrated",robotIsCalibrated);
 		//		SmartDashboard.putNumber("LeftEncoder", RobotMap.drivetrainLeftEncoder.getDistance());

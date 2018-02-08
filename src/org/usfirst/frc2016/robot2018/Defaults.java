@@ -17,28 +17,31 @@ package org.usfirst.frc2016.robot2018;
 public class Defaults {
     
     // Drive train voltage limit
-    protected static final double DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT = .95;
+    public static final double DRIVETRAIN_VOLTAGE_LIMIT_DEFAULT = .95;
 
 // Autonomous Time Defaults
-    protected static final double AUT_SHOOTING_DELAY = .5;
+    public static final double AUT_SHOOTING_DELAY = .5;
 
 // Autonomous Other Defaults
-    protected static final double AUT_ENCODER_DISTANCE_10FT = 100; //Distance in inches
-    protected static final double AUT_RIGHT_Y = -.8;
-    protected static final double AUT_LEFT_Y = .8;
+    public static final double AUT_ENCODER_DISTANCE_10FT = 100; //Distance in inches
+    public static final double AUT_RIGHT_Y = -.8;
+    public static final double AUT_LEFT_Y = .8;
 
-// Elevator presets
-    protected static final double ARMPOSITION1 = 550;
-    protected static final double ARMPOSITION2 = 1000;
-    protected static final double ARMPOSITION3 = 7000;
-    
+// Arm presets
+    public static final int ARMPOSITION0 = 2214;
+    public static final int ARMPOSITION1 = 2300;
+    public static final int ARMPOSITION2 = 2800;
+    public static final int ARMPOSITION3 = 3300;
+    public static final int REVERSESOFTLIMIT = 2210;
+    public static final int FORWARDSOFTLIMIT = 3450;
+    public static final double ARM_P = 1;
+    public static final double ARM_I = 0;
+    public static final double ARM_D = 0;
 
 // Wheel Speeds
-    protected static final double CUBE_WHEEL_SPEED0 = .6;
-    protected static final double WHEEL_SPEED1 = 700;
-    protected static final double WHEEL_SPEED2 = 1500;
-    protected static final double WHEEL_SPEED3 = 2900;
-
-//
+    public static final double WHEELSPEED_SHOOT = 1;
+    public static final double WHEELSPEED_IN = .5;
+    public static final double WHEELSPEED_OUT = .5;
+    public static final double WHEELSPEED_ROTATE = .3;
 }
 
