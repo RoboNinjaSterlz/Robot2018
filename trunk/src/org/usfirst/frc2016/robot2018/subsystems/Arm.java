@@ -14,7 +14,6 @@ package org.usfirst.frc2016.robot2018.subsystems;
 import org.usfirst.frc2016.robot2018.Defaults;
 import org.usfirst.frc2016.robot2018.Robot;
 import org.usfirst.frc2016.robot2018.RobotMap;
-import org.usfirst.frc2016.robot2018.commands.*;
 import org.usfirst.frc2016.robot2018.Config;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -35,8 +34,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
  *
  */
 public class Arm extends Subsystem {
-	private boolean didWeMove=true;
-
 	private final int NUM_PRESETS = 4;
 	/*
 	 * Values set by config
@@ -53,16 +50,20 @@ public class Arm extends Subsystem {
 	private final String ARMPOSITION = "Arm Position";
 	private final String ARMPOSITIONERROR = "Arm Position Error";
 	private final String ARMPRESETPOSITION = "Arm Position Preset";
+
 	// Desired encoder count for positioning the armTaloner.
 	private double desiredPosition = 0;
 
-	// keeps track of when the armTalon is calibrated
-	private boolean needsCalibrate;
+	// to know if the last command actually moved the arm
+	private boolean didWeMove=true;
+
+	// last preset position requested
 	private int lastPreset;
+	
 	// How good does the position need to be
 	private final double AbsoluteTolerance = 3;
 
-	// Labels for presets in robot prefs on dashboard
+	// Labels for presets in robot prefs, config and on dashboard
 	public final String[] ArmPositionLabels = { 
 			"Floor",
 			"Low",
@@ -127,8 +128,9 @@ public class Arm extends Subsystem {
 	public void goTo(double height) {
 		desiredPosition = height;
 		armTalon.set(ControlMode.Position, height);
-		//armTalon.enableControl();
 	}
+
+	// Go to one of the preset positions
 	public void goToPreset(int position) {
 
 		didWeMove = false;
@@ -140,20 +142,27 @@ public class Arm extends Subsystem {
 			lastPreset=position;
 		}
 	}
+	
+	// Creep up
 	public void incrementHeight() {
 		desiredPosition++;
 		goTo(desiredPosition);
 	}
 
+	// Creep down
 	public void decrementHeight() {
 		desiredPosition--;
 		goTo(desiredPosition);
 	}
 
+	// Move arm relative to current postion
 	public void adjustHeight( double adjust) {
 		desiredPosition+=adjust;
-		if (desiredPosition < 0) {
-			desiredPosition = 0;
+		if (desiredPosition < armReverseSoftLimit) {
+			desiredPosition = armReverseSoftLimit;
+		}
+		if (desiredPosition > armForwardSoftLimit) {
+			desiredPosition = armForwardSoftLimit;
 		}
 		goTo(desiredPosition);
 	}	
@@ -162,13 +171,13 @@ public class Arm extends Subsystem {
 	public boolean isPositioned() {
 		double position;
 		position = Math.abs(desiredPosition - getPosition());
-		if (desiredPosition == 0 && armTalon.getSensorCollection().isRevLimitSwitchClosed()) {
+		/*
+		 * The following is only valid for relative encoders
+		if (desiredPosition == 0 && armTalon.getSensorCollection().isRevLimitSwitchClosed()) 
 			armTalon.set(ControlMode.Position, 0);
 		}
-		return (position <= AbsoluteTolerance);
-		/*    		position = gearArmTalon.getClosedLoopError();
-    		return (AbsoluteTolerance >= Math.abs(position));
 		 */
+		return (position <= AbsoluteTolerance);
 	}
 
 	// Returns the current postion error
@@ -204,7 +213,9 @@ public class Arm extends Subsystem {
 		SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
 		SmartDashboard.putBoolean("Did Move",ArmMoved());
 		SmartDashboard.putNumber("Last Arm Position", lastPreset );
-		//    		SmartDashboard.putBoolean("limit sensor", shooterLowerLimit.get());
+		/*
+		 * The following is out for now. Add back if we need to tune the arm postion 
+		
 		if (lastPreset == HIGH) {
 			double joyY = Robot.oi.operatorJoy.getY();
 
@@ -216,6 +227,7 @@ public class Arm extends Subsystem {
 			goTo(position);
 
 		}
+		*/
 	}
 
 	public void initDefaultCommand() {

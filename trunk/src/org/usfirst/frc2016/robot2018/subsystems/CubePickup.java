@@ -198,11 +198,8 @@ public class CubePickup extends Subsystem {
 		/*
 		 * Now update the wheel motors with the values determined above.
 		 */
-
-
 		talonCubeWheelRight.set(ControlMode.PercentOutput, rightWheel);
 		talonCubeWheelLeft.set(ControlMode.PercentOutput, leftWheel);
-
 	}
 
 	// Put methods for controlling this subsystem
@@ -242,11 +239,11 @@ public class CubePickup extends Subsystem {
 	    wheelSpeedOut = config.getDouble("CubeWheelSpeedOut", Defaults.WHEELSPEED_OUT);
 	    wheelSpeedRotate = config.getDouble("CubeWheelSpeedRotate", Defaults.WHEELSPEED_ROTATE);
 	}
+	
 	public void shootCube(){
 		shootCubeActive = true;
-		//  talonCubeWheelRight.set(ControlMode.PercentOutput, 1);
-		//  talonCubeWheelLeft.set(ControlMode.PercentOutput, 1);	
 	}
+
 	public void endShoot(){
 		shootCubeActive = false;
 	}
