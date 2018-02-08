@@ -84,6 +84,7 @@ public class CubePickup extends Subsystem {
 	private final SensorCollection rightTalonSensors = new SensorCollection(talonCubeWheelRight);
 	
 	public CubePickup() {
+		loadConfig(Robot.config);
 		compressor.start();
 		armOpen = false;
 		currentButton = NO_BUTTON;	// No buttons pressed

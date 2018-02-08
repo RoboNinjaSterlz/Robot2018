@@ -123,7 +123,7 @@ public class Robot extends TimedRobot {
 		robotIsCalibrated = false;
 		robotPrefs = new RobotPrefs();
 		config = new Config(CONFIG_FILE_NAME);
-		loadConfig();
+		//loadConfig();
 		calAttemptTimer = 0;
 		calTimerExpired = false;
 

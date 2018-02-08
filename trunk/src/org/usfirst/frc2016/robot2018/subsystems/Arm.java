@@ -90,7 +90,7 @@ public class Arm extends Subsystem {
 	// here. Call these from Commands.
 
 	public Arm() {
-		presetPositions[MEDIUM]=1500;
+		loadConfig(Robot.config);
 		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute , 0, 0);
 		armTalon.setSensorPhase(true); //!!!! Check this !!!!!
 		armTalon.setInverted(true);
