@@ -209,54 +209,59 @@ public class DriveTrainSRX extends Subsystem {
 		}
 		_sb.setLength(0);
 		//differentialDrive.tankDrive(0,0);
-	}
-
 		
-		
-		
-		
-/*		leftOut = joy.getY()*MAX_SPEED;
-	   rightOut = joy.getRawAxis(5) * MAX_SPEED;
-	   talonDriveLeft1.set(ControlMode.Velocity, leftOut);
-	   talonDriveRight1.set(ControlMode.Velocity, rightOut);
+		/*
+		leftOut = joy.getY()*MAX_SPEED;
+		rightOut = joy.getRawAxis(5) * MAX_SPEED;
+		talonDriveLeft1.set(ControlMode.Velocity, leftOut);
+		talonDriveRight1.set(ControlMode.Velocity, rightOut);
+		 */   
    }
-*/   
    
-    public void arcadeDrive(Joystick joy) {
-//    	robotDrive.arcadeDrive(joy, true);
-    	differentialDrive.arcadeDrive(joy.getY(), joy.getX(), true);
-    	lastJoyLeft = joy.getY();
-    	lastJoyRight = joy.getX();
-    	lastDriveMode = "ArcadeJoy";
+   /*
+    * Used for single joystick device using X and Y
+    */
+   public void arcadeDrive(Joystick joy) {
+	   accumSpeed = 0;
+	   lastJoyLeft = joy.getY();
+	   lastJoyRight = joy.getX();
+	   differentialDrive.arcadeDrive(joy.getY(), joy.getX(), true);
+	   lastDriveMode = "ArcadeJoy";
     }
     
-    public void arcadeDrive(Joystick leftJoy, Joystick rightJoy) {
+   /*
+    * Arcade drive using game pad axis 5 as direction
+    */
+   public void arcadeDrive(Joystick leftJoy, Joystick rightJoy) {
     	accumSpeed = 0;
-    	double rightY;
-    	double leftY;
-    	    rightY= leftJoy.getRawAxis(4);
-    		leftY = leftJoy.getY();
-        	lastJoyLeft = leftY;
-        	lastJoyRight = rightY;
-        	lastDriveMode = "ArcadeJoy";
+    	lastJoyRight= leftJoy.getRawAxis(5);
+    	lastJoyLeft = leftJoy.getY();
     	// The values to pass to the motors are adjusted by the ramp method
-        leftCurrentSpeed = returnRamp(leftCurrentSpeed, leftY);
-        rightCurrentSpeed = returnRamp(rightCurrentSpeed, rightY);
-        //SmartDashboard.putNumber("LJoyY", letfY);
+        leftCurrentSpeed = returnRamp(leftCurrentSpeed, lastJoyLeft);
+        rightCurrentSpeed = returnRamp(rightCurrentSpeed, lastJoyRight);
+        //SmartDashboard.putNumber("LJoyY", lastJoyLeft);
         //SmartDashboard.putNumber("LCurrentSpeed", leftCurrentSpeed);
-//    	robotDrive.arcadeDrive(leftCurrentSpeed, rightCurrentSpeed, true);
         differentialDrive.arcadeDrive(leftCurrentSpeed, rightCurrentSpeed, true);
+        lastDriveMode = "ArcadeJoy";
     }
-    public void arcadeDrive(double speed, double direction) {
-//    	robotDrive.arcadeDrive(speed, direction);
+
+   /*
+    * Arcade drive using values for speed and direction
+    */
+   public void arcadeDrive(double speed, double direction) {
 		velocityDrive(speed, direction);
     	lastJoyLeft = speed;
     	lastJoyRight = direction;
     	lastDriveMode = "Arcade";
-
     }
     
-    public void gyroDrive(double speed, double angle) {
+   /*
+    * Arcade style drive using the gyro for feed back
+    * 
+    * Special case:
+    * 	If the speed is zero, take the speed from the left joy stick.
+    */
+   public void gyroDrive(double speed, double angle) {
     	double steer =  (Robot.gyro.getAngle() - angle);
     	if (steer > 180) {
     		steer = steer - 360;
@@ -289,7 +294,10 @@ public class DriveTrainSRX extends Subsystem {
     	}
     }
     
-    public void velocityDrive(double speed, double direction) {
+   /*
+    * Used by other methods for sort of PID speed control 
+    */
+   public void velocityDrive(double speed, double direction) {
     	double rateError;
     	double finalSpeed;
     	double averageRate;
@@ -319,15 +327,17 @@ public class DriveTrainSRX extends Subsystem {
     		SmartDashboard.putNumber("rateError", rateError);
     		SmartDashboard.putNumber("accumSpeed", accumSpeed);
     	}
-//    	robotDrive.arcadeDrive(finalSpeed, direction);
+
     	differentialDrive.arcadeDrive(finalSpeed, direction);
     	lastJoyLeft = finalSpeed;
     	lastJoyRight = direction;
     	lastDriveMode = "Velocity";
-
     }
     
-    public double getAverageRate() {
+   /*
+    * Returns the average encoder rate of left and right 
+    */
+   public double getAverageRate() {
     	double rightRate, leftRate, averageRate;
 
     	rightRate = talonDriveRight1.getSelectedSensorVelocity(0);
@@ -336,38 +346,40 @@ public class DriveTrainSRX extends Subsystem {
     	return averageRate;
     }
     
+    /*
+     * Tank drive using game pad where right comes from axis 5
+     */
     public void tankDrive(Joystick leftJoy, Joystick rightJoy) {
     	accumSpeed = 0;
-    	double rightY;
-    	double leftY;
-    	rightY= leftJoy.getRawAxis(5);
-    	leftY = leftJoy.getY();
-    	lastJoyLeft = leftY;
-    	lastJoyRight = rightY;
-    	lastDriveMode = "Tank";
+    	lastJoyRight= leftJoy.getRawAxis(5);
+    	lastJoyLeft = leftJoy.getY();
 
         // The values to pass to the motors are adjusted by the ramp method
-        leftCurrentSpeed = returnRamp(leftCurrentSpeed, leftY);
-        rightCurrentSpeed = returnRamp(rightCurrentSpeed, rightY);
+        leftCurrentSpeed = returnRamp(leftCurrentSpeed, lastJoyLeft);
+        rightCurrentSpeed = returnRamp(rightCurrentSpeed, lastJoyRight);
         SmartDashboard.putNumber("LSpeed", leftCurrentSpeed);
         SmartDashboard.putNumber("RSpeed", rightCurrentSpeed);
     	differentialDrive.tankDrive(-leftCurrentSpeed, rightCurrentSpeed, true);
-    	
+    	lastDriveMode = "Tank";    	
     }	
     
+    /*
+     * Stop the robot
+     */
     public void driveStop() {
-    
-//    	robotDrive.tankDrive(0,0);
     	differentialDrive.tankDrive(0,0);
     	accumSpeed = 0;
     }
     
+    /*
+     * Set the max voltage to the drive train
+     * The joystick values will be scaled by this value
+     */
     public void setMax() {
-//        robotDrive.setMaxOutput(drivetrainVoltageLimit);
         differentialDrive.setMaxOutput(drivetrainVoltageLimit);
     }
     
-       // This method performs the ramp calculation for the drive train
+    // This method performs the ramp calculation for the drive train
     double returnRamp(double currentSpeed, double desiredSpeed) {
     	double delta = desiredSpeed - currentSpeed;
 
