@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
 	private  String PIMode = "comeback2later";
 	private final double DELAYPERCOUNT = .02;
 	private final double CAL_TIME_LIMIT = 4;
-	private final String CONFIG_FILE_NAME = "robot.cfg";
+	private final String CONFIG_FILE_NAME = "/c/robot.cfg";
 	private double calAttemptTimer;
 	private boolean calTimerExpired;
 	private CameraServer camServer;
@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
 	SendableChooser<Command> chooser = new SendableChooser<>();
 	public static LCTelemetry telem;
 	public static Config config;
+	public static char gameData = 'N'; 
 	/*
 	 * 	Motors
 	 * 		Drive train left 2 sparks Drive train
@@ -79,11 +80,10 @@ public class Robot extends TimedRobot {
 	/*
 	 * Labels for auto routines 
 	 */
-	final String straightGearAuto = "Straight Gear";
+	final String robotCenter = "Robot Center";
 	final String driveForward = "Drive Forward";
-	final String gearRightSide = "Right Side Gear";
-	final String gearLeftSide = "Left Side Gear";
-	final String straightGearAndBaseline = "straightGearAndBaseline";
+	final String robotRightSide = "Robot Right";
+	final String robotLeftSide = "Robot Left";
 	/*
 	 * What autonomous command to run
 	 * and options on the smart dashboard for auto
@@ -138,11 +138,6 @@ public class Robot extends TimedRobot {
 		server.setSource(frontCamera);
 		frontCameraActive=true;
 		 */
-		/*
-		 * The following line loads the grip program on the roborio
-		 * comment out the line while debugging the filters on the pc.
-		 */
-		//loadGrip();
 
 		SmartDashboard.putData(Scheduler.getInstance());
 		telem = new LCTelemetry();      // create telem handle.
@@ -173,7 +168,10 @@ public class Robot extends TimedRobot {
 
 		// Set up the position choices
 		autoChooser = new SendableChooser();
-		//		autoChooser.addDefault(driveForward, new AutoCrossBaseline());
+		autoChooser.addDefault(driveForward, new AutoCrossBaseline());
+		autoChooser.addDefault(robotCenter, new AutoStartCenter());
+		autoChooser.addDefault(robotLeftSide, new AutoStartLeft());
+		autoChooser.addDefault(robotRightSide, new AutoStartRight());
 		SmartDashboard.putData("Autonomous choices", autoChooser);
 
 		// instantiate the command used for the autonomous period
