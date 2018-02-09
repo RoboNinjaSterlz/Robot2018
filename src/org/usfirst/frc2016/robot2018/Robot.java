@@ -8,6 +8,17 @@
 // update. Deleting the comments indicating the section will prevent
 // it from being updated in the future.
 
+	/*
+	 * 	Motors
+	 * 		Drive train left 3 Talons SRX Drive train
+	 * 		Drive train rigt 3 TalonSRX
+	 * 		Climber   1 spark		winch
+	 * 		Arm  1 Talon SRX
+	 * 		Intake Wheels left Talon SRX
+	 * 		Intake Wheels right Talon SRX
+	 * 		Intake opener  1 solenoid
+	 * 		Compressor
+	 */
 
 package org.usfirst.frc2016.robot2018;
 
@@ -27,8 +38,6 @@ import edu.wpi.first.wpilibj.CameraServer;
 import org.usfirst.frc2016.robot2018.OI;
 import org.usfirst.frc2016.robot2018.commands.*;
 import org.usfirst.frc2016.robot2018.subsystems.*;
-
-//import java.io.IOException;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -57,26 +66,7 @@ public class Robot extends TimedRobot {
 	public static LCTelemetry telem;
 	public static Config config;
 	public static char gameData = 'N'; 
-	/*
-	 * 	Motors
-	 * 		Drive train left 2 sparks Drive train
-	 * 		Drive train rigt 2 sparks
-	 * 		Climber   1 spark		winch
-	 * 		Gear Elevator 1 Talon SRX	gear elevator
-	 * 		Gear Slide linear servo		gear slide
-	 * 		Gear grabber 1 solenoid		gear grabber
-	 * 		Drive train shift 1 solenoid
-	 * 		Compressor????
-	 * 		Ball Intake 1 spark		ball grabber
-	 * 		Floor belt  1 spark			floor belt
-	 * 		transverse belt 1 spark		transverse belt
-	 * 		low goal shooter 1 spark	low goal shooter
-	 * 		High goal elevator 1 spark	high goal elevator
-	 * 		High goal shooter 1 talon SRX    high goal shooter
-	 * 
-	 * 		25 inch side battery left front - 8 for battery
-	 * 		23.5 - 6.6 for height
-	 */
+	
 	/*
 	 * Labels for auto routines 
 	 */
@@ -199,8 +189,7 @@ public class Robot extends TimedRobot {
 
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
-		PIMode = IDLE;
-		//updateDashboard();
+		updateDashboard();
 	}
 
 	public void autonomousInit() {
@@ -217,9 +206,8 @@ public class Robot extends TimedRobot {
 		if (!robotIsCalibrated) {
 			calibrateRobot();
 		}
-		Scheduler.getInstance().run();
-		gyro.periodic();
-		PIMode = GEARALIGNMENT;
+// should be called automatically by the new framework
+//		gyro.periodic();
 		writeTelem();
 		updateDashboard();
 	}
@@ -241,7 +229,7 @@ public class Robot extends TimedRobot {
 			calibrateRobot();
 		}
 		Scheduler.getInstance().run();
-		PIMode = GEARALIGNMENT;
+//		PIMode = GEARALIGNMENT;
 		writeTelem();
 		updateDashboard();
 	}
@@ -252,16 +240,6 @@ public class Robot extends TimedRobot {
 		LiveWindow.run();
 	}
 
-	/*
-    private void loadGrip() {
-        // Run GRIP in a new process
-       try {
-           new ProcessBuilder("/home/lvuser/grip").inheritIO().start();
-       } catch (IOException e) {
-           e.printStackTrace();
-       }    	    
- 	}
-	 */    
 	public void calibrateRobot() {
 		if ((calAttemptTimer) <= CAL_TIME_LIMIT/DELAYPERCOUNT) {
 			calAttemptTimer ++;
@@ -269,15 +247,11 @@ public class Robot extends TimedRobot {
 		else {
 			calTimerExpired = true;
 		}
-		//		if (gearElevator.isCalibrated()) {
-		//			robotIsCalibrated = true;
-		//		}
 	}
 
 	public boolean isCalibrated() {
 		return robotIsCalibrated;
 	}
-
 
 	private void writeTelem() {
 		cubePickup.writeTelemetyValues();
