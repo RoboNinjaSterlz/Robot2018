@@ -253,10 +253,10 @@ public class Arm extends Subsystem {
 	}
 	
 	public void loadConfig(Config config) {
-		presetPositions[FLOOR] = config.getInt("ArmPosition+armPositionLabels[FLOOR]",Defaults.ARMPOSITION0);
-		presetPositions[LOW] = config.getInt("ArmPosition+armPositionLabels[LOW]", Defaults.ARMPOSITION1);
-		presetPositions[MEDIUM] = config.getInt("ArmPosition+armPositionLabels[MEDIUM]", Defaults.ARMPOSITION2);
-		presetPositions[HIGH] = config.getInt("ArmPosition+armPositionLabels[HIGH]",Defaults.ARMPOSITION3);
+		presetPositions[FLOOR] = config.getInt("ArmPosition"+ArmPositionLabels[FLOOR],Defaults.ARMPOSITION0);
+		presetPositions[LOW] = config.getInt("ArmPosition"+ArmPositionLabels[LOW], Defaults.ARMPOSITION1);
+		presetPositions[MEDIUM] = config.getInt("ArmPosition"+ArmPositionLabels[MEDIUM], Defaults.ARMPOSITION2);
+		presetPositions[HIGH] = config.getInt("ArmPosition"+ArmPositionLabels[HIGH],Defaults.ARMPOSITION3);
 		
 		armReverseSoftLimit = config.getInt("ArmReverseSoftLimit", Defaults.REVERSESOFTLIMIT);
 //		armTalon.configReverseSoftLimitThreshold(armReverseSoftLimit, 0);
