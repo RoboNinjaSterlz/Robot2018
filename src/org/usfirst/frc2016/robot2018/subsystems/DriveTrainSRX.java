@@ -351,7 +351,7 @@ public class DriveTrainSRX extends Subsystem {
      */
     public void tankDrive(Joystick leftJoy, Joystick rightJoy) {
     	accumSpeed = 0;
-    	lastJoyRight= leftJoy.getRawAxis(5);
+    	lastJoyRight= rightJoy.getRawAxis(5);
     	lastJoyLeft = leftJoy.getY();
 
         // The values to pass to the motors are adjusted by the ramp method
@@ -359,6 +359,7 @@ public class DriveTrainSRX extends Subsystem {
         rightCurrentSpeed = returnRamp(rightCurrentSpeed, lastJoyRight);
         SmartDashboard.putNumber("LSpeed", leftCurrentSpeed);
         SmartDashboard.putNumber("RSpeed", rightCurrentSpeed);
+        SmartDashboard.putNumber("lastJoyLeft", lastJoyLeft);
     	differentialDrive.tankDrive(-leftCurrentSpeed, rightCurrentSpeed, true);
     	lastDriveMode = "Tank";    	
     }	
