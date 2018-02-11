@@ -42,6 +42,7 @@ public class Arm extends Subsystem {
 	private double armP;
 	private double armI;
 	private double armD;
+	private double armF;
 	/* End config values */
 	
 	private final String ARMMOTOR = "Arm Motor";
@@ -111,7 +112,7 @@ public class Arm extends Subsystem {
 		armTalon.config_kP(0, armP, 0);
 		armTalon.config_kI(0, armI, 0);
 		armTalon.config_kD(0, armD, 0);
-		
+		armTalon.config_kF(0, armF, 0);
 		/* Set relevant frame periods to be at least as fast as periodic rate*/
 		armTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, 0);
 		armTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, 0);
@@ -138,7 +139,8 @@ public class Arm extends Subsystem {
 	// Goes to the encoder count that is passed
 	public void goTo(double height) {
 		desiredPosition = height;
-		armTalon.set(ControlMode.Position, height);
+		//armTalon.set(ControlMode.Position, height);
+		armTalon.set(ControlMode.MotionMagic, height);
 	}
 
 	// Go to one of the preset positions
@@ -274,7 +276,8 @@ public class Arm extends Subsystem {
 		armP = config.getDouble("ArmP",Defaults.ARM_P);
 		armI = config.getDouble("ArmI",Defaults.ARM_I);
 		armD = config.getDouble("ArmD",Defaults.ARM_D);
-/*
+		armF = config.getDouble("ArmF",Defaults.ARM_F);
+		/*
 		armTalon.config_kP(0, armP, 0);
 		armTalon.config_kI(0, armI, 0);
 		armTalon.config_kD(0, armD, 0);

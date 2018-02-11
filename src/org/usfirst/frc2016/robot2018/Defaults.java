@@ -25,16 +25,16 @@ public class Defaults {
     public static final double DRIVETRAIN_F = .6;
 
     // Arm presets
-    public static final int ARMPOSITION0 = 2214;
+    public static final int ARMPOSITION0 = 2240;
     public static final int ARMPOSITION1 = 2300;
     public static final int ARMPOSITION2 = 2800;
-    public static final int ARMPOSITION3 = 3300;
+    public static final int ARMPOSITION3 = 3000;
     public static final int REVERSESOFTLIMIT = 2210;
     public static final int FORWARDSOFTLIMIT = 3450;
-    public static final double ARM_P = 1;
+    public static final double ARM_P = 3;
     public static final double ARM_I = 0;
     public static final double ARM_D = 0;
-
+    public static final double ARM_F = 1.9;
     // Wheel Speeds
     public static final double WHEELSPEED_SHOOT = 1;
     public static final double WHEELSPEED_IN = .5;
