@@ -409,9 +409,13 @@ public class DriveTrainSRX extends Subsystem {
    public void goToUsingMM(double speed, int distance, double direction) {
 	   int finalLeft, finalRight;
 	   int distanceAsCounts;
-	   distance = 36;
+	   distance = 100;
 	   // convert absolute distance into absolute encoder counts
 	   distanceAsCounts = (int)Math.round(distance * COUNTS_PER_INCH);
+	   
+	   // for now reset encoders to make debugging easier
+	   // May not want to do this in the final code.
+	   resetEncoders();
 	   
 	   /*
 	    * Get the current encoder counts and 
@@ -437,8 +441,8 @@ public class DriveTrainSRX extends Subsystem {
     * when the move has completed
     */
    public boolean moveComplete() {
-	   boolean leftGood = Math.abs(talonDriveLeft1.getClosedLoopError(1)) > MAX_POSITION_ERROR;
-	   boolean rightGood = Math.abs(talonDriveRight1.getClosedLoopError(1)) > MAX_POSITION_ERROR;
+	   boolean leftGood = Math.abs(talonDriveLeft1.getClosedLoopError(1)) < MAX_POSITION_ERROR;
+	   boolean rightGood = Math.abs(talonDriveRight1.getClosedLoopError(1)) < MAX_POSITION_ERROR;
 	   return (leftGood && rightGood);
    }
    /*
