@@ -88,6 +88,7 @@ public class Arm extends Subsystem {
 	 * 5295/1000*100 = 529.5 Revs Per 100ms
 	 * SRX intrnal speed is -1023 to +1023
 	 * Feed forward = 1023/529.5 = 1.93
+	 * .227
 	 * 
 	 * Arm travel approx 1000 counts
 	 * Desired travel time 1 second
@@ -136,6 +137,7 @@ public class Arm extends Subsystem {
 		armTalon.config_kI(0, armI, 0);
 		armTalon.config_kD(0, armD, 0);
 		armTalon.config_kF(0, armF, 0);
+		armTalon.config_IntegralZone(0,80,0);
 		/* Set relevant frame periods to be at least as fast as periodic rate*/
 		armTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, 0);
 		armTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, 0);
