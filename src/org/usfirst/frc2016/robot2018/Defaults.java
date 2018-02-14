@@ -23,6 +23,8 @@ public class Defaults {
     public static final double DRIVETRAIN_I = 0;
     public static final double DRIVETRAIN_D = 0;
     public static final double DRIVETRAIN_F = .6;
+    public static final int DRIVE_CRUISEVELOCITY = 410;
+    public static final int DRIVE_ACCELERATION = 205;
 
     // Arm presets
     public static final int ARMPOSITION0 = 2240;

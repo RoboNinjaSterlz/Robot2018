@@ -68,6 +68,8 @@ public class DriveTrainSRX extends Subsystem {
 	public double driveI;
 	public double driveD;
 	public double driveF;
+	public int cruiseVelocity;
+	public int acceleration;
 	/*
      * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      * End of values set by RobotPrefs
@@ -90,31 +92,24 @@ public class DriveTrainSRX extends Subsystem {
 	 * 
 	 * Cim max no load speed 5330
 	 * Cim load speed 5330 * .85 = 4530
-	 * Gear box 64:1 ??
-	 * 4964/64 = 77.5 RPMs
-	 * 77.5/60 = 1.29 RPS
-	 * 4096 counts/rev * 1.29 RPS = 5295 Counts / second
-	 * 5295/1000*100 = 529.5 Revs Per 100ms
+	 * Gear box 5.88:1 
+	 * 4530/5.88 = 770 RPMs
+	 * 770/60 = 12.83 RPS
+	 * 4096 counts/rev * 12.83 RPS = 52,563 Counts / second
+	 * 52563/1000*100 = 5256.3 Revs Per 100ms
 	 * SRX intrnal speed is -1023 to +1023
-	 * Feed forward = 1023/529.5 = 1.93
+	 * Feed forward = 1023/5256.3 = .1946
 	 * 
-	 * Arm travel approx 1000 counts
-	 * Desired travel time 1 second
-	 * 1000 Counts/second
-	 * 1000/1000 * 100 = 100 counts / 100ms
-	 * Cruise Velocity = 100
-	 * 
-	 * 6 inches /sec = 2048 counts/second
-	 * 2048/1000 * 100 = 205 counts/100ms
-	 * Cruise Velocity = 205
+	 * Wheel diameter = 4 inches
+	 * 4 * Pi = 12.57 inches per rev
+	 * 12 inches /sec = 4096 counts/second
+	 * 4096/1000 * 100 = 409.6 counts/100ms
+	 * Cruise Velocity = 410
 	 * 
 	 * Plan on .25 seconds to accelerate and .25 to decelerate
-	 * Acceleration = 200
+	 * Acceleration = 205
 	 */
 
-	
-	
-	
    public DriveTrainSRX() {
 	loadConfig(Robot.config);
 	talonDriveLeft1.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative , 0, 0);
@@ -217,8 +212,8 @@ public class DriveTrainSRX extends Subsystem {
 	talonDriveLeft1.configPeakOutputReverse(-1, 0);
 	
 	/* set acceleration and vcruise velocity - see documentation */
-	talonDriveLeft1.configMotionCruiseVelocity(205, 0);
-	talonDriveLeft1.configMotionAcceleration(100, 0);
+	talonDriveLeft1.configMotionCruiseVelocity(cruiseVelocity, 0);
+	talonDriveLeft1.configMotionAcceleration(acceleration, 0);
 	
    	/*
    	 * Additional settings for motion magic Right
@@ -235,8 +230,8 @@ public class DriveTrainSRX extends Subsystem {
 	talonDriveRight1.configPeakOutputReverse(-1, 0);
 	
 	/* set acceleration and vcruise velocity - see documentation */
-	talonDriveRight1.configMotionCruiseVelocity(204, 0);
-	talonDriveRight1.configMotionAcceleration(100, 0);
+	talonDriveRight1.configMotionCruiseVelocity(cruiseVelocity, 0);
+	talonDriveRight1.configMotionAcceleration(acceleration, 0);
    }
    
    
@@ -555,6 +550,8 @@ public class DriveTrainSRX extends Subsystem {
     	driveI = config.getDouble("DriveI", Defaults.DRIVETRAIN_I);
     	driveD = config.getDouble("DriveD", Defaults.DRIVETRAIN_D);
     	driveF = config.getDouble("DriveF", Defaults.DRIVETRAIN_F);
+    	cruiseVelocity = config.getInt("CruiseVelocity", Defaults.DRIVE_CRUISEVELOCITY);
+    	acceleration = config.getInt("Acceleration", Defaults.DRIVE_ACCELERATION);
     }
     @Override
     	public void initDefaultCommand() {
