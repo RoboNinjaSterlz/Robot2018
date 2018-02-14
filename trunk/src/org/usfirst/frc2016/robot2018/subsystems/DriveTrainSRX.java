@@ -91,14 +91,14 @@ public class DriveTrainSRX extends Subsystem {
 	 * Magic Motion vales
 	 * 
 	 * Cim max no load speed 5330
-	 * Cim load speed 5330 * .85 = 4530
-	 * Gear box 5.88:1 
-	 * 4530/5.88 = 770 RPMs
-	 * 770/60 = 12.83 RPS
-	 * 4096 counts/rev * 12.83 RPS = 52,563 Counts / second
-	 * 52563/1000*100 = 5256.3 Revs Per 100ms
+	 * Cim load speed 5330 * .9 = 4797
+	 * Gear box 6.66:1 
+	 * 4797/6.66 = 720.2 RPMs
+	 * 720.2/60 = 12.0 RPS
+	 * 4096 counts/rev * 12.0 RPS = 49,152 Counts / second
+	 * 49152/1000*100 = 4915.2 Revs Per 100ms
 	 * SRX intrnal speed is -1023 to +1023
-	 * Feed forward = 1023/5256.3 = .1946
+	 * Feed forward = 1023/4915.2 = .8333
 	 * 
 	 * Wheel diameter = 4 inches
 	 * 4 * Pi = 12.57 inches per rev
