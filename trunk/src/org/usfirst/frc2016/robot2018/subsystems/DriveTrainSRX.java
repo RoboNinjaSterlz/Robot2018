@@ -56,7 +56,7 @@ public class DriveTrainSRX extends Subsystem {
 	private final double SPEED_I = .05;
 	private final double speedFeedForward = .6;
 	private final double COUNTS_PER_INCH = 4096/12.57;  //Encoder counts / inch of travel
-	private final int MAX_POSITION_ERROR = 15;
+	private final int MAX_POSITION_ERROR = 40;
 	
 	/*
      * The following block of variables are used to hold values loaded from
@@ -418,8 +418,9 @@ public class DriveTrainSRX extends Subsystem {
 	   
 	   // for now reset encoders to make debugging easier
 	   // May not want to do this in the final code.
-	   resetEncoders();
-	   
+	 //  resetEncoders();
+	   SmartDashboard.putNumber("Left After Reset", getLeftEncoder());
+	   SmartDashboard.putNumber("Right After Reset", getRightEncoder());
 	   /*
 	    * Get the current encoder counts and 
 	    * convert distance counts to relative counts
@@ -434,6 +435,7 @@ public class DriveTrainSRX extends Subsystem {
 		 * Will need to disable motorSafetyHepler when not using differentialDrive Calls
 		 */
 		SmartDashboard.putNumber("FinalRight", finalRight);
+		SmartDashboard.putNumber("Distance in Counts", distanceAsCounts);
    }
    
    public void pingDifferentialDrive() {
@@ -520,8 +522,8 @@ public class DriveTrainSRX extends Subsystem {
     }
     
     public void resetEncoders() {
-    	talonDriveLeft1.setSelectedSensorPosition(0, 0, 0);
-    	talonDriveRight1.setSelectedSensorPosition(0, 0, 0);
+    	talonDriveLeft1.setSelectedSensorPosition(0, 0, 10);
+    	talonDriveRight1.setSelectedSensorPosition(0, 0, 10);
     }
 
     public void addTelemetryHeaders() {

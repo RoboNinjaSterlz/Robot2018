@@ -72,7 +72,7 @@ public class OI {
 
         operatorJoy = new Joystick(2);
         
-        armFloorButton = new JoystickButton(operatorJoy, 8);
+        armFloorButton = new JoystickButton(operatorJoy, 7);
         armFloorButton.whenPressed(new ArmFloor());
         loadPrefsButton = new JoystickButton(operatorJoy, 10);
         loadPrefsButton.whenPressed(new LoadPrefs());
@@ -80,7 +80,7 @@ public class OI {
         armHighButton.whenPressed(new ArmHigh());
         armMediumButton = new JoystickButton(operatorJoy, 9);
         armMediumButton.whenPressed(new ArmMedium());
-        armLowButton = new JoystickButton(operatorJoy, 7);
+        armLowButton = new JoystickButton(operatorJoy, 8);
         armLowButton.whenPressed(new ArmLow());
         shootButton = new JoystickButton(operatorJoy, 2);
         shootButton.whileHeld(new ShootCube());

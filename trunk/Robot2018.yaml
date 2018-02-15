@@ -427,7 +427,7 @@ Children:
           default: '1'
           name: Button
           validators: null
-          value: '7'
+          value: '8'
         Command: !!robotbuilder.data.properties.TypeSelectionProperty
           default: None
           name: Command
@@ -543,7 +543,7 @@ Children:
           default: '1'
           name: Button
           validators: null
-          value: '8'
+          value: '7'
         Command: !!robotbuilder.data.properties.TypeSelectionProperty
           default: None
           name: Command
@@ -1594,16 +1594,16 @@ Children:
       Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
         name: Requires, type: Subsystem, validators: null, value: DriveTrainSRX}
       Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
-        default: &id025
+        default: []
+        name: Parameter presets
+        validators: null
+        value:
         - !!robotbuilder.data.properties.ParameterSet
           name: defalut
           parameters:
           - {name: distance, type: int, value: '0'}
           - {name: speed, type: double, value: '0'}
           - {name: direction, type: double, value: '0'}
-        name: Parameter presets
-        validators: null
-        value: *id025
       Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
         name: Button on SmartDashboard, validators: null, value: true}
     Base: Command
