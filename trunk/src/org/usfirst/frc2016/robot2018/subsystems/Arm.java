@@ -276,7 +276,7 @@ public class Arm extends Subsystem {
 
 	}
 	public void addTelemetryHeaders() {
-//		Robot.currentMonitor.registerMonitorDevive(armTalon, ARMMOTOR);
+		Robot.currentMonitor.registerMonitorDevive(armTalon, ARMMOTOR);
 		Robot.telem.addColumn(ARMPOSITION);
 		Robot.telem.addColumn(ARMPOSITIONERROR);
 		Robot.telem.addColumn(ARMPRESETPOSITION);
