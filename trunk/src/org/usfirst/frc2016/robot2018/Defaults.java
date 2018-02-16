@@ -42,8 +42,8 @@ public class Defaults {
     public static final double WHEELSPEED_IN = .5;
     public static final double WHEELSPEED_OUT = .5;
     public static final double WHEELSPEED_ROTATE = .3;
-
-
+    // Winch presets
+    public static final double WINCHDELAYSTOP = .5;
     // Autonomous Time Defaults
      public static final double AUT_SHOOTING_DELAY = .5;
 

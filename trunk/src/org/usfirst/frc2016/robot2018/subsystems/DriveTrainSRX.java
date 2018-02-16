@@ -354,7 +354,7 @@ public class DriveTrainSRX extends Subsystem {
     		//Robot.drivetrain.arcadeDrive(Robot.oi.driveRight.getY(), steer);
     		//velocityDrive(Robot.oi.driveRight.getY(), steer);
 //        	robotDrive.arcadeDrive(Robot.oi.driveRight.getY(), steer);
-        	differentialDrive.arcadeDrive(Robot.oi.driveLeft.getX(), steer);
+        	differentialDrive.arcadeDrive(Robot.oi.driveLeft.getY(), steer);
     	}
     	else {
 //    		Robot.drivetrain.arcadeDrive(speed, steer);
@@ -412,15 +412,16 @@ public class DriveTrainSRX extends Subsystem {
     */
    public void goToUsingMM(double speed, int distance, double direction) {
 	   int distanceAsCounts;
-	   distance = 100;
+	   distance = 36;
 	   // convert absolute distance into absolute encoder counts
 	   distanceAsCounts = (int)Math.round(distance * COUNTS_PER_INCH);
 	   
 	   // for now reset encoders to make debugging easier
 	   // May not want to do this in the final code.
-	 //  resetEncoders();
+	   // resetEncoders();
+	   // resetEncoders();
 	   SmartDashboard.putNumber("Left After Reset", getLeftEncoder());
-	   SmartDashboard.putNumber("Right After Reset", getRightEncoder());
+	  // SmartDashboard.putNumber("Right After Reset", getRightEncoder());
 	   /*
 	    * Get the current encoder counts and 
 	    * convert distance counts to relative counts
@@ -434,8 +435,8 @@ public class DriveTrainSRX extends Subsystem {
 		/*
 		 * Will need to disable motorSafetyHepler when not using differentialDrive Calls
 		 */
-		SmartDashboard.putNumber("FinalRight", finalRight);
-		SmartDashboard.putNumber("Distance in Counts", distanceAsCounts);
+	//	SmartDashboard.putNumber("FinalRight", finalRight);
+	//	SmartDashboard.putNumber("Distance in Counts", distanceAsCounts);
    }
    
    public void pingDifferentialDrive() {
@@ -449,8 +450,11 @@ public class DriveTrainSRX extends Subsystem {
    public boolean moveComplete() {
 	   boolean leftGood = Math.abs(finalLeft - getLeftEncoder()) < MAX_POSITION_ERROR;
 	   boolean rightGood = Math.abs(finalRight - getRightEncoder()) < MAX_POSITION_ERROR;
-	   SmartDashboard.putNumber("TalonDriveRight position", finalRight);
+	 //  SmartDashboard.putNumber("TalonDriveRight position", finalRight);
 	   SmartDashboard.putBoolean("Right Good", rightGood);
+	   SmartDashboard.putBoolean("Left Good", leftGood);
+	   SmartDashboard.putNumber("Left Error", finalLeft - getLeftEncoder());
+	   SmartDashboard.putNumber("Right Error", finalRight - getRightEncoder());
 	   return (leftGood && rightGood);
    }
    /*
