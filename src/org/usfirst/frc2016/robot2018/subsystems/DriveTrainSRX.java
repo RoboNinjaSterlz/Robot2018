@@ -491,7 +491,7 @@ public class DriveTrainSRX extends Subsystem {
 	 */
 	public void goToUsingMM(double speed, int distance, double direction) {
 		int distanceAsCounts;
-		distance = 36;
+		
 		// convert absolute distance into absolute encoder counts
 		distanceAsCounts = (int)Math.round(distance * COUNTS_PER_INCH);
 
@@ -506,9 +506,13 @@ public class DriveTrainSRX extends Subsystem {
 		 * convert distance counts to relative counts
 		 * It may be better to reset the counters.
 		 */
+		// Dont reset the counters since it is not reliable
 		finalLeft = distanceAsCounts + getLeftEncoder();
 		finalRight = distanceAsCounts + getRightEncoder();
 
+		// Reset the speed in case someone else changed it.
+		talonDriveLeft1.configMotionCruiseVelocity(cruiseVelocity, 0);
+		talonDriveRight1.configMotionCruiseVelocity(cruiseVelocity, 0);
 		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
 		talonDriveRight1.set(ControlMode.MotionMagic, finalRight);
 		/*
@@ -516,6 +520,38 @@ public class DriveTrainSRX extends Subsystem {
 		 */
 		//	SmartDashboard.putNumber("FinalRight", finalRight);
 		//	SmartDashboard.putNumber("Distance in Counts", distanceAsCounts);
+	}
+	
+	public void gotoUsingMM(int  leftDistance, int rightDistance) {
+		int distanceAsCountsLeft;
+		int distanceAsCountsRight;
+		int leftCruiseVelocity;
+		int rightCruiseVelocity;
+		
+		// convert absolute distance into absolute encoder counts
+		distanceAsCountsLeft = (int)Math.round(leftDistance * COUNTS_PER_INCH);
+		distanceAsCountsRight = (int)Math.round(rightDistance * COUNTS_PER_INCH);
+		
+		// Dont reset the counters since it is not reliable
+		finalLeft = distanceAsCountsLeft + getLeftEncoder();
+		finalRight = distanceAsCountsRight + getRightEncoder();
+
+		// Now adjust the speed for the distance difference
+		double distanceRatio = leftDistance/rightDistance;
+		if (distanceRatio > 1) {
+			leftCruiseVelocity = (int)Math.round(cruiseVelocity * distanceRatio);
+			rightCruiseVelocity = cruiseVelocity;
+		}
+		else {
+			leftCruiseVelocity = cruiseVelocity;
+			rightCruiseVelocity = (int)Math.round(cruiseVelocity/distanceRatio);
+		}
+		
+		// Reset the speed in case someone else changed it.
+		talonDriveLeft1.configMotionCruiseVelocity(leftCruiseVelocity, 0);
+		talonDriveRight1.configMotionCruiseVelocity(rightCruiseVelocity, 0);
+		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
+		talonDriveRight1.set(ControlMode.MotionMagic, finalRight);
 	}
 
 	public void pingDifferentialDrive() {
