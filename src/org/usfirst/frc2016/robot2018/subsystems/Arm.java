@@ -43,6 +43,7 @@ public class Arm extends Subsystem {
 	private double armI;
 	private double armD;
 	private double armF;
+	private int armCruiseVelocity;
 	/* End config values */
 	
 	private final String ARMMOTOR = "Arm Motor";
@@ -148,9 +149,8 @@ public class Arm extends Subsystem {
 		armTalon.configPeakOutputForward(.5, 0);
 		armTalon.configPeakOutputReverse(-.5, 0);
 		/* set acceleration and vcruise velocity - see documentation */
-		armTalon.configMotionCruiseVelocity(100, 0);
+		armTalon.configMotionCruiseVelocity(armCruiseVelocity, 0);
 		armTalon.configMotionAcceleration(200, 0);
-//		armTalon.set(ControlMode.Position, presetPositions[MEDIUM]);
 		armTalon.set(ControlMode.MotionMagic, presetPositions[MEDIUM]);
 		goToPreset(MEDIUM);
 	}
@@ -302,6 +302,7 @@ public class Arm extends Subsystem {
 		armI = config.getDouble("ArmI",Defaults.ARM_I);
 		armD = config.getDouble("ArmD",Defaults.ARM_D);
 		armF = config.getDouble("ArmF",Defaults.ARM_F);
+		armCruiseVelocity = config.getInt("ArmCruiseVelocity", Defaults.ARMCRUISEVELOCITY);
 		/*
 		armTalon.config_kP(0, armP, 0);
 		armTalon.config_kI(0, armI, 0);
