@@ -37,11 +37,14 @@ public class Defaults {
     public static final double ARM_I = 0;
     public static final double ARM_D = 0;
     public static final double ARM_F = 1.9;
+    public static final int ARMCRUISEVELOCITY = 100;
+    
     // Wheel Speeds
     public static final double WHEELSPEED_SHOOT = 1;
     public static final double WHEELSPEED_IN = .5;
     public static final double WHEELSPEED_OUT = .5;
     public static final double WHEELSPEED_ROTATE = .3;
+    public static final double WHEELSPEED_HOLD = .2;
     // Winch presets
     public static final double WINCHDELAYSTOP = .5;
     // Autonomous Time Defaults
