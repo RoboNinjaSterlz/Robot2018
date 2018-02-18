@@ -156,7 +156,7 @@ public class Robot extends TimedRobot {
         cubeTrigger = new CubeTrigger();
         robotPrefs.setupPrefs();
 //		robotPrefs.doLoadPrefs();
-		arm.goToPreset(arm.MEDIUM);
+		arm.goToPreset(arm.HIGH);
 		oi = new OI();
 		pdPanel = new PowerDistributionPanel();
 		//		Scheduler.getInstance().add(new CalibrateElevator());
@@ -211,6 +211,8 @@ public class Robot extends TimedRobot {
 		if (!robotIsCalibrated) {
 			calibrateRobot();
 		}
+		writeTelem();
+		updateDashboard();
 // should be called automatically by the new framework
 //		gyro.periodic();
 		writeTelem();
