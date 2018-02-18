@@ -25,6 +25,7 @@ public class Defaults {
     public static final double DRIVETRAIN_F = .6;
     public static final int DRIVE_CRUISEVELOCITY = 410;
     public static final int DRIVE_ACCELERATION = 205;
+    public static final boolean DRIVE_JOYSQUARE = true;
 
     // Arm presets
     public static final int ARMPOSITION0 = 2240;

@@ -70,6 +70,7 @@ public class DriveTrainSRX extends Subsystem {
 	public double driveF;
 	public int cruiseVelocity;
 	public int acceleration;
+	public boolean joySquare;
 	/*
 	 * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 	 * End of values set by RobotPrefs
@@ -313,7 +314,7 @@ public class DriveTrainSRX extends Subsystem {
 			}
 		}
 
-		differentialDrive.tankDrive(-leftMotorOutput, rightMotorOutput, false);
+		differentialDrive.tankDrive(-leftMotorOutput, rightMotorOutput, joySquare);
 	}
 
 	public void gameVelocityDrive(Joystick joy) {
@@ -673,6 +674,7 @@ public class DriveTrainSRX extends Subsystem {
 		driveF = config.getDouble("DriveF", Defaults.DRIVETRAIN_F);
 		cruiseVelocity = config.getInt("CruiseVelocity", Defaults.DRIVE_CRUISEVELOCITY);
 		acceleration = config.getInt("Acceleration", Defaults.DRIVE_ACCELERATION);
+		joySquare = config.getBoolean("DriveJoystickSquare", Defaults.DRIVE_JOYSQUARE);
 	}
 	@Override
 	public void initDefaultCommand() {
