@@ -31,7 +31,8 @@ public class Defaults {
     public static final int ARMPOSITION0 = 2240;
     public static final int ARMPOSITION1 = 2300;
     public static final int ARMPOSITION2 = 2800;
-    public static final int ARMPOSITION3 = 3000;
+    public static final int ARMPOSITION3 = 3448;
+    public static final int ARMPOSITION4 = 3000;
     public static final int REVERSESOFTLIMIT = 2210;
     public static final int FORWARDSOFTLIMIT = 3450;
     public static final double ARM_P = 3;
