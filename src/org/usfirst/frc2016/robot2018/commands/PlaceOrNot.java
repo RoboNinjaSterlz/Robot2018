@@ -48,6 +48,9 @@ public class PlaceOrNot extends Command {
     	if (Robot.gameData == m_startingPosition.charAt(0)) {
     		placeCube = true;
     	}
+    	else {
+    		placeCube = false;
+    	}
     }
 
     // Called repeatedly when this Command is scheduled to run
