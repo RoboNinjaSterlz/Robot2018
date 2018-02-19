@@ -99,8 +99,8 @@ public class OI {
         SmartDashboard.putData("GamePadDrive", new GamePadDrive());
         SmartDashboard.putData("WinchJoy", new WinchJoy());
         SmartDashboard.putData("GameVelocityDrive", new GameVelocityDrive());
-        SmartDashboard.putData("GetGameData: Left", new GetGameData("L"));
-        SmartDashboard.putData("GetGameData: Right", new GetGameData("R"));
+        SmartDashboard.putData("GetGameData: Left", new GetGameData());
+        SmartDashboard.putData("GetGameData: Right", new GetGameData());
         SmartDashboard.putData("AutoCrossBaseline", new AutoCrossBaseline());
         SmartDashboard.putData("AutoStartRight", new AutoStartRight());
         SmartDashboard.putData("AutoStartLeft", new AutoStartLeft());
