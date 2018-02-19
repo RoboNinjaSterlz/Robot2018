@@ -525,7 +525,7 @@ public class DriveTrainSRX extends Subsystem {
 		//	SmartDashboard.putNumber("Distance in Counts", distanceAsCounts);
 	}
 
-	public void gotoUsingMM(int  leftDistance, int rightDistance) {
+	public void goToUsingMM(int  leftDistance, int rightDistance) {
 		int distanceAsCountsLeft;
 		int distanceAsCountsRight;
 		int leftCruiseVelocity;
