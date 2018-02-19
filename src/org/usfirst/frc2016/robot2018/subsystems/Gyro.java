@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.SPI;
  */
 public class Gyro extends Subsystem {
 	
-	public final double gyroP = 0.01;
+	public final double gyroP = 0.09;
 	public final double TURN_MAX = 0.6;
 	private final String GYRO_ANGLE = "Gyro Angle";
 	private final String GYRO_ROLL = "Gyro Roll";
