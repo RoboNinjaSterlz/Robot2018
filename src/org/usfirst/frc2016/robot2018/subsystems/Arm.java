@@ -235,7 +235,7 @@ public class Arm extends Subsystem {
 		}
 	}
 
-	// Returns the current postion error
+	// Returns the current position error
 	public int getPositionError() {
 		return armTalon.getClosedLoopError(0);
 	}
@@ -261,7 +261,7 @@ public class Arm extends Subsystem {
 	}
 	
 	public void applyBrake() {
-		armTalon.set(ControlMode.PercentOutput, 0);
+		//armTalon.set(ControlMode.PercentOutput, 0);
 		armBrakeSolenoid.set(false);
 		brakeState = true;
 	}
