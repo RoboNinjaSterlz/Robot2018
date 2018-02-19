@@ -437,7 +437,7 @@ public class LCTelemetry {
     	if(sp_FileName.length() == 0 )
     		sp_FileName = "telemetry";
     		
-    	String s_FullFileName = sp_FilePath + "/" + sp_FileName + "_" + this.s_TelemType;
+    	String s_FullFileName = sp_FilePath + "/" + sp_FileName; // + "_" + this.s_TelemType;
     	
     	if(this.bp_TimestampFile==true)
     		s_FullFileName += "_" +  new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
