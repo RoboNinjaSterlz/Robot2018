@@ -160,8 +160,8 @@ public class Arm extends Subsystem {
 		/* set acceleration and vcruise velocity - see documentation */
 		armTalon.configMotionCruiseVelocity(armCruiseVelocity, 0);
 		armTalon.configMotionAcceleration(200, 0);
-		armTalon.set(ControlMode.MotionMagic, presetPositions[HIGH]);
-		goToPreset(HIGH);
+		//armTalon.set(ControlMode.MotionMagic, presetPositions[HIGH]);
+		//-goToPreset(HIGH);
 		applyBrake();
 	}
 
@@ -261,6 +261,7 @@ public class Arm extends Subsystem {
 	}
 	
 	public void applyBrake() {
+		armTalon.set(ControlMode.PercentOutput, 0);
 		armBrakeSolenoid.set(false);
 		brakeState = true;
 	}

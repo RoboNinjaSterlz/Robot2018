@@ -156,7 +156,7 @@ public class Robot extends TimedRobot {
         cubeTrigger = new CubeTrigger();
         robotPrefs.setupPrefs();
 //		robotPrefs.doLoadPrefs();
-		arm.goToPreset(arm.HIGH);
+		//arm.goToPreset(arm.HIGH);
 		oi = new OI();
 		pdPanel = new PowerDistributionPanel();
 		//		Scheduler.getInstance().add(new CalibrateElevator());
@@ -182,6 +182,7 @@ public class Robot extends TimedRobot {
 		cubePickup.addTelemetryHeaders();
 		gyro.addTelemetryHeaders();
 		arm.addTelemetryHeaders();
+		winch.addTelemetryHeaders();
 	}
 
 	/**
@@ -213,10 +214,6 @@ public class Robot extends TimedRobot {
 		}
 		writeTelem();
 		updateDashboard();
-// should be called automatically by the new framework
-//		gyro.periodic();
-		writeTelem();
-		updateDashboard();
 	}
 
 	public void teleopInit() {
@@ -236,7 +233,6 @@ public class Robot extends TimedRobot {
 			calibrateRobot();
 		}
 		Scheduler.getInstance().run();
-//		PIMode = GEARALIGNMENT;
 		writeTelem();
 		updateDashboard();
 	}
