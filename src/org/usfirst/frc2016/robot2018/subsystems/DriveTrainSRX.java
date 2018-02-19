@@ -279,7 +279,8 @@ public class DriveTrainSRX extends Subsystem {
 		xSpeed = limit(xSpeed);
 		xSpeed = applyDeadband(xSpeed, .01);
 
-		zRotation = limit(zRotation);
+		// Flip the sign for steering
+		zRotation = -limit(zRotation);
 		zRotation = applyDeadband(zRotation, .01);
 
 		// Square the inputs (while preserving the sign) to increase fine control
@@ -374,7 +375,7 @@ public class DriveTrainSRX extends Subsystem {
 		lastJoyLeft = joy.getY();
 		lastJoyRight = joy.getX();
 		//		differentialDrive.arcadeDrive(joy.getY(), joy.getX(), true);
-		arcadeDriveX(joy.getY(), joy.getX(), true);
+		arcadeDriveX(joy.getY(), joy.getX(), joySquare);
 		lastDriveMode = "ArcadeJoy";
 	}
 
@@ -391,7 +392,7 @@ public class DriveTrainSRX extends Subsystem {
 		//SmartDashboard.putNumber("LJoyY", lastJoyLeft);
 		//SmartDashboard.putNumber("LCurrentSpeed", leftCurrentSpeed);
 		//		differentialDrive.arcadeDrive(leftCurrentSpeed, rightCurrentSpeed, true);
-		arcadeDriveX(leftCurrentSpeed, rightCurrentSpeed, true);
+		arcadeDriveX(leftCurrentSpeed, rightCurrentSpeed, joySquare);
 		lastDriveMode = "ArcadeJoy";
 	}
 
@@ -435,11 +436,11 @@ public class DriveTrainSRX extends Subsystem {
 			//        	robotDrive.arcadeDrive(Robot.oi.driveRight.getY(), steer);
 			//			differentialDrive.arcadeDrive(Robot.oi.driveLeft.getY(), steer);
 			lastJoyLeft= Robot.oi.driveLeft.getY();
-			arcadeDriveX(lastJoyLeft, -steer ,false);
+			arcadeDriveX(lastJoyLeft, steer ,false);
 		}
 		else {
 			//    		Robot.drivetrain.arcadeDrive(speed, steer);
-			velocityDrive(speed, -steer);
+			velocityDrive(speed, steer);
 			lastJoyLeft = speed;
 			lastJoyRight = steer;
 		}
@@ -493,15 +494,15 @@ public class DriveTrainSRX extends Subsystem {
 	 */
 	public void goToUsingMM(double speed, int distance, double direction) {
 		int distanceAsCounts;
-		SmartDashboard.putNumber("Distance", distance);
+
 		// convert absolute distance into absolute encoder counts
 		distanceAsCounts = (int)Math.round(distance * COUNTS_PER_INCH);
-		SmartDashboard.putNumber("Distance as counts", distanceAsCounts);
+		
 		// for now reset encoders to make debugging easier
 		// May not want to do this in the final code.
 		// resetEncoders();
 		// resetEncoders();
-		SmartDashboard.putNumber("Left After Reset", getLeftEncoder());
+		//SmartDashboard.putNumber("Left After Reset", getLeftEncoder());
 		// SmartDashboard.putNumber("Right After Reset", getRightEncoder());
 		/*
 		 * Get the current encoder counts and 
@@ -511,7 +512,7 @@ public class DriveTrainSRX extends Subsystem {
 		// Dont reset the counters since it is not reliable
 		finalLeft = distanceAsCounts + getLeftEncoder();
 		finalRight = distanceAsCounts + getRightEncoder();
-SmartDashboard.putNumber("FinalRight", finalRight);
+		
 		// Reset the speed in case someone else changed it.
 		talonDriveLeft1.configMotionCruiseVelocity(cruiseVelocity, 0);
 		talonDriveRight1.configMotionCruiseVelocity(cruiseVelocity, 0);
