@@ -271,7 +271,7 @@ public class Robot extends TimedRobot {
 	}
 	
 	private void updateDashboard() {
-		SmartDashboard.putBoolean("Robot Calibrated",robotIsCalibrated);
+		//SmartDashboard.putBoolean("Robot Calibrated",robotIsCalibrated);
 		//		SmartDashboard.putNumber("LeftEncoder", RobotMap.drivetrainLeftEncoder.getDistance());
 		SmartDashboard.putNumber("LeftEncoderRaw", Robot.driveTrainSRX.getLeftEncoder());
 		//		SmartDashboard.putNumber("RightEncoder", RobotMap.drivetrainRightEncoder.getDistance());
@@ -279,7 +279,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putNumber("Encoder Rate", driveTrainSRX.getAverageRate());
 
 		SmartDashboard.putString("PIMode", PIMode);
-		SmartDashboard.putBoolean("Gear Detector", RobotMap.cubeDetector.get());
+		SmartDashboard.putBoolean("Cube Detector", RobotMap.cubeDetector.get());
 
 	}
 }

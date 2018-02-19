@@ -665,12 +665,17 @@ public class DriveTrainSRX extends Subsystem {
 		Robot.telem.addColumn("Drive Left");
 		Robot.telem.addColumn("Drive Right");
 		Robot.telem.addColumn("Drive Mode");
+		Robot.telem.addColumn("Left Encoder");
+		Robot.telem.addColumn("Right Encoder");
+		
 	}
 
 	public void writeTelemetry() {
 		Robot.telem.saveDouble("Drive Left", lastJoyLeft);
 		Robot.telem.saveDouble("Drive Right", lastJoyRight);
 		Robot.telem.saveString("Drive Mode", lastDriveMode);
+		Robot.telem.saveInteger("Left Encoder", getLeftEncoder());
+		Robot.telem.saveInteger("Right Encoder", getRightEncoder());
 	}
 
 	public void loadConfig(Config config) {
