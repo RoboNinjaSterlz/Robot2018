@@ -235,16 +235,16 @@ public class CubePickup extends Subsystem {
 		Robot.telem.addColumn(ARMSOPEN);
 		Robot.telem.addColumn(WHEELSPOV);
 		Robot.telem.addColumn(SHOOTCUBEACTIVE);
-		Robot.telem.addColumn(LEFTARMPOSITION);
-		Robot.telem.addColumn(RIGHTARMPOSITION);
+		//Robot.telem.addColumn(LEFTARMPOSITION);
+		//Robot.telem.addColumn(RIGHTARMPOSITION);
 	}
 
 	public void writeTelemetyValues() {
 		Robot.telem.saveBoolean(ARMSOPEN,armOpen);
 		Robot.telem.saveInteger(WHEELSPOV,pov);
 		Robot.telem.saveBoolean(SHOOTCUBEACTIVE, shootCubeActive);
-		Robot.telem.saveInteger(LEFTARMPOSITION, leftTalonSensors.getAnalogIn());
-		Robot.telem.saveInteger(RIGHTARMPOSITION, rightTalonSensors.getAnalogIn());
+		//Robot.telem.saveInteger(LEFTARMPOSITION, leftTalonSensors.getAnalogIn());
+		//Robot.telem.saveInteger(RIGHTARMPOSITION, rightTalonSensors.getAnalogIn());
 
 	}
 

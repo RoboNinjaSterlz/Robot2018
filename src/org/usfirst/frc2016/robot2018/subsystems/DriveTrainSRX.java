@@ -476,8 +476,8 @@ public class DriveTrainSRX extends Subsystem {
 				accumSpeed = -.7;
 			}
 			finalSpeed = accumSpeed + rateError * SPEED_P;
-			SmartDashboard.putNumber("rateError", rateError);
-			SmartDashboard.putNumber("accumSpeed", accumSpeed);
+			//SmartDashboard.putNumber("rateError", rateError);
+			//SmartDashboard.putNumber("accumSpeed", accumSpeed);
 		}
 
 		//		differentialDrive.arcadeDrive(finalSpeed, direction);
@@ -556,8 +556,8 @@ public class DriveTrainSRX extends Subsystem {
 		}
 
 		// Reset the speed in case someone else changed it.
-		SmartDashboard.putNumber("FinalRight", finalRight);
-		SmartDashboard.putNumber("Distance in Counts", distanceAsCountsRight);
+		//SmartDashboard.putNumber("FinalRight", finalRight);
+		//SmartDashboard.putNumber("Distance in Counts", distanceAsCountsRight);
 		talonDriveLeft1.configMotionCruiseVelocity(leftCruiseVelocity, 0);
 		talonDriveRight1.configMotionCruiseVelocity(rightCruiseVelocity, 0);
 		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
@@ -576,8 +576,8 @@ public class DriveTrainSRX extends Subsystem {
 		boolean leftGood = Math.abs(finalLeft - getLeftEncoder()) < MAX_POSITION_ERROR;
 		boolean rightGood = Math.abs(finalRight - getRightEncoder()) < MAX_POSITION_ERROR;
 		//  SmartDashboard.putNumber("TalonDriveRight position", finalRight);
-		SmartDashboard.putBoolean("Right Good", rightGood);
-		SmartDashboard.putBoolean("Left Good", leftGood);
+		//SmartDashboard.putBoolean("Right Good", rightGood);
+		//SmartDashboard.putBoolean("Left Good", leftGood);
 		SmartDashboard.putNumber("Left Error", finalLeft - getLeftEncoder());
 		SmartDashboard.putNumber("Right Error", finalRight - getRightEncoder());
 		return (leftGood && rightGood);
@@ -605,9 +605,9 @@ public class DriveTrainSRX extends Subsystem {
 		// The values to pass to the motors are adjusted by the ramp method
 		leftCurrentSpeed = returnRamp(leftCurrentSpeed, lastJoyLeft);
 		rightCurrentSpeed = returnRamp(rightCurrentSpeed, lastJoyRight);
-		SmartDashboard.putNumber("LSpeed", leftCurrentSpeed);
-		SmartDashboard.putNumber("RSpeed", rightCurrentSpeed);
-		SmartDashboard.putNumber("lastJoyLeft", lastJoyLeft);
+		//SmartDashboard.putNumber("LSpeed", leftCurrentSpeed);
+		//SmartDashboard.putNumber("RSpeed", rightCurrentSpeed);
+		//SmartDashboard.putNumber("lastJoyLeft", lastJoyLeft);
 		differentialDrive.tankDrive(-leftCurrentSpeed, rightCurrentSpeed, joySquare);
 		lastDriveMode = "Tank";    	
 	}	
