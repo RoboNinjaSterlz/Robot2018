@@ -46,14 +46,14 @@ public class Arm extends Subsystem {
 	private double armF;
 	private int armCruiseVelocity;
 	/* End config values */
-	
+
 	private final String ARMMOTOR = "Arm Motor";
 	private final String ARMPOSITION = "Arm Position";
 	private final String ARMPOSITIONERROR = "Arm Position Error";
 	private final String ARMPRESETPOSITION = "Arm Position Preset";
 	private final String ARMSCALEPOSITION = "Arm Scale Position";
 	private final String ARMBRAKESTATE = "Arm Brake State";
-	
+
 	// Desired encoder count for positioning the armTaloner.
 	private double desiredPosition = 0;
 
@@ -62,12 +62,16 @@ public class Arm extends Subsystem {
 
 	// last preset position requested
 	private int lastPreset;
-	
+
 	// How good does the position need to be
 	private final double AbsoluteTolerance = 3;
-	
+
 	// Brake state for telemetry
 	private boolean brakeState;
+
+	// First move indicates we have actually tried to move
+	// and the talon is now in a positioning mode.
+	private boolean madeFirstMove;
 
 	// Labels for presets in robot prefs, config and on dashboard
 	public final String[] ArmPositionLabels = { 
@@ -84,7 +88,7 @@ public class Arm extends Subsystem {
 	MEDIUM = 2,
 	SCALE = 3,
 	HIGH = 4;
-	
+
 	/*
 	 * Magic Motion vales
 	 * 
@@ -151,7 +155,7 @@ public class Arm extends Subsystem {
 		/* Set relevant frame periods to be at least as fast as periodic rate*/
 		armTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, 0);
 		armTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, 0);
-		
+
 		/* set the peak and nominal outputs */
 		armTalon.configNominalOutputForward(0, 0);
 		armTalon.configNominalOutputReverse(0, 0);
@@ -177,6 +181,8 @@ public class Arm extends Subsystem {
 		//armTalon.set(ControlMode.Position, height);
 		releaseBrake();
 		armTalon.set(ControlMode.MotionMagic, height);
+		madeFirstMove = true;
+
 	}
 
 	// Go to one of the preset positions
@@ -191,7 +197,7 @@ public class Arm extends Subsystem {
 			lastPreset=position;
 		}
 	}
-	
+
 	// Creep up
 	public void incrementHeight() {
 		desiredPosition++;
@@ -259,7 +265,7 @@ public class Arm extends Subsystem {
 			return -1;
 		}
 	}
-	
+
 	public void applyBrake() {
 		//armTalon.set(ControlMode.PercentOutput, 0);
 		armBrakeSolenoid.set(false);
@@ -273,15 +279,18 @@ public class Arm extends Subsystem {
 
 	// mostly for debugging updates the smart dashboard with position info
 	public void periodic() {
-		SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
-		SmartDashboard.putNumber("Arm Position", getPosition());
-		SmartDashboard.putNumber("Arm Position Error", getPositionError());
-		SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
-		SmartDashboard.putBoolean("Did Move",ArmMoved());
-		SmartDashboard.putNumber("Last Arm Position", lastPreset );
+		if (madeFirstMove) {
+			SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
+
+			SmartDashboard.putNumber("Arm Position", getPosition());
+			SmartDashboard.putNumber("Arm Position Error", getPositionError());
+			SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
+//			SmartDashboard.putBoolean("Did Move",ArmMoved());
+			SmartDashboard.putNumber("Last Arm Position", lastPreset );
+		}
 		/*
 		 * The following is out for now. Add back if we need to tune the arm postion 
-		
+
 		if (lastPreset == HIGH) {
 			double joyY = Robot.oi.operatorJoy.getY();
 
@@ -293,7 +302,7 @@ public class Arm extends Subsystem {
 			goTo(position);
 
 		}
-		*/
+		 */
 	}
 
 	public void initDefaultCommand() {
@@ -317,7 +326,7 @@ public class Arm extends Subsystem {
 		Robot.telem.saveInteger(ARMPRESETPOSITION, lastPreset);
 		Robot.telem.saveBoolean(ARMBRAKESTATE, brakeState);
 	}
-	
+
 	public void loadConfig(Config config) {
 		presetPositions[FLOOR] = config.getInt("ArmPosition"+ArmPositionLabels[FLOOR],Defaults.ARMPOSITION0);
 		presetPositions[LOW] = config.getInt("ArmPosition"+ArmPositionLabels[LOW], Defaults.ARMPOSITION1);
@@ -325,9 +334,9 @@ public class Arm extends Subsystem {
 		presetPositions[SCALE] = config.getInt("ArmPosition"+ArmPositionLabels[SCALE],Defaults.ARMPOSITION3);
 		presetPositions[HIGH] = config.getInt("ArmPosition"+ArmPositionLabels[HIGH],Defaults.ARMPOSITION4);
 		armReverseSoftLimit = config.getInt("ArmReverseSoftLimit", Defaults.REVERSESOFTLIMIT);
-//		armTalon.configReverseSoftLimitThreshold(armReverseSoftLimit, 0);
+		//		armTalon.configReverseSoftLimitThreshold(armReverseSoftLimit, 0);
 		armForwardSoftLimit = config.getInt("ArmForwardSoftLimit", Defaults.FORWARDSOFTLIMIT);
-//		armTalon.configForwardSoftLimitThreshold(armForwardSoftLimit, 0);
+		//		armTalon.configForwardSoftLimitThreshold(armForwardSoftLimit, 0);
 		armP = config.getDouble("ArmP",Defaults.ARM_P);
 		armI = config.getDouble("ArmI",Defaults.ARM_I);
 		armD = config.getDouble("ArmD",Defaults.ARM_D);
@@ -337,7 +346,7 @@ public class Arm extends Subsystem {
 		armTalon.config_kP(0, armP, 0);
 		armTalon.config_kI(0, armI, 0);
 		armTalon.config_kD(0, armD, 0);
-*/	}
+		 */	}
 
 }
 

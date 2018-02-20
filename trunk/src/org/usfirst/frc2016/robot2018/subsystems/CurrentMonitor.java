@@ -80,7 +80,7 @@ public class CurrentMonitor extends Subsystem {
     			Robot.telem.saveBoolean(currentStatus[i].name+" Fail", currentStatus[i].fail);
     			Robot.telem.saveDouble(currentStatus[i].name+" Voltage",currentStatus[i].throttle);
     			Robot.telem.saveDouble(currentStatus[i].name+" Current", currentStatus[i].amps);
-    			SmartDashboard.putNumber(currentStatus[i].name+"Fail", currentStatus[i].failCount);    			
+    			//SmartDashboard.putNumber(currentStatus[i].name+"Fail", currentStatus[i].failCount);    			
     			SmartDashboard.putNumber(currentStatus[i].name+"Currrent", currentStatus[i].amps);
     		}
     	}

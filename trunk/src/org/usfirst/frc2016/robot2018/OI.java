@@ -95,17 +95,7 @@ public class OI {
 
 
         // SmartDashboard Buttons
-        SmartDashboard.putData("SpeedSetup", new SpeedSetup());
-        SmartDashboard.putData("GamePadDrive", new GamePadDrive());
-        SmartDashboard.putData("WinchJoy", new WinchJoy());
-        SmartDashboard.putData("GameVelocityDrive", new GameVelocityDrive());
         SmartDashboard.putData("AutoCrossBaseline", new AutoCrossBaseline());
-        SmartDashboard.putData("AutoStartRight", new AutoStartRight());
-        SmartDashboard.putData("AutoStartLeft", new AutoStartLeft());
-        SmartDashboard.putData("AutoStartCenter", new AutoStartCenter());
-        SmartDashboard.putData("MagicDrive: defalut", new MagicDrive(0, 0, 0));
-        SmartDashboard.putData("AutoEject", new AutoEject());
-        SmartDashboard.putData("ArmScale", new ArmScale());
         SmartDashboard.putData("TestArcDrive: test 36 15", new TestArcDrive(0, 12836));
         SmartDashboard.putData("TurnLeftOrRight: false", new TurnLeftOrRight(false));
 

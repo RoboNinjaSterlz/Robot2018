@@ -45,8 +45,8 @@ public class PlaceOrNot extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-    	SmartDashboard.putString("GameData", ""+Robot.gameData);
-    	SmartDashboard.putString("StartingPosition", ""+ m_startingPosition.charAt(0));
+    	//SmartDashboard.putString("GameData", ""+Robot.gameData);
+    	//SmartDashboard.putString("StartingPosition", ""+ m_startingPosition.charAt(0));
     
     	waitCounter = 0;	// Reset the timer
     	if (Robot.gameData == m_startingPosition.charAt(0)) {
@@ -55,7 +55,7 @@ public class PlaceOrNot extends Command {
     	else {
     		placeCube = false;
     	}
-    	SmartDashboard.putBoolean("placeCube",placeCube);
+    	//SmartDashboard.putBoolean("placeCube",placeCube);
     }
 
     // Called repeatedly when this Command is scheduled to run
