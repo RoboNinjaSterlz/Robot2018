@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
  *
  */
 public class CurrentMonitor extends Subsystem {
-	private final int numPdPorts = 10;
+	private final int numPdPorts = 12;
 	private final int FAILTHRESHOLD = 100;
 	private final double THROTTLETHRESHOLD = .2;
 	private final double CURRENT_THRESHOLD = .2;

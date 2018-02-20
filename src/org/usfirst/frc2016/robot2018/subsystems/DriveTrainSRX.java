@@ -502,8 +502,6 @@ public class DriveTrainSRX extends Subsystem {
 		// May not want to do this in the final code.
 		// resetEncoders();
 		// resetEncoders();
-		//SmartDashboard.putNumber("Left After Reset", getLeftEncoder());
-		// SmartDashboard.putNumber("Right After Reset", getRightEncoder());
 		/*
 		 * Get the current encoder counts and 
 		 * convert distance counts to relative counts
@@ -542,7 +540,7 @@ public class DriveTrainSRX extends Subsystem {
 
 		// Now adjust the speed for the distance difference
 		// prevent division by zero
-		if (rightDistance == 0) {
+		if (rightDistance == 0 || leftDistance == 0) {
 			distanceRatio = 1;
 		}
 		else {
@@ -558,6 +556,8 @@ public class DriveTrainSRX extends Subsystem {
 		}
 
 		// Reset the speed in case someone else changed it.
+		SmartDashboard.putNumber("FinalRight", finalRight);
+		SmartDashboard.putNumber("Distance in Counts", distanceAsCountsRight);
 		talonDriveLeft1.configMotionCruiseVelocity(leftCruiseVelocity, 0);
 		talonDriveRight1.configMotionCruiseVelocity(rightCruiseVelocity, 0);
 		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
