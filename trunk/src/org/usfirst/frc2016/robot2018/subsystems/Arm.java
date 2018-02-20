@@ -34,6 +34,12 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 public class Arm extends Subsystem {
 	private final int NUM_PRESETS = 5;
+
+	// How good does the position need to be
+	private final double AbsoluteTolerance = 3;
+
+	// Minimum number of good positions need to be in position
+	private final int MinimumGoodPositions = 4;
 	/*
 	 * Values set by config
 	 */
@@ -63,15 +69,15 @@ public class Arm extends Subsystem {
 	// last preset position requested
 	private int lastPreset;
 
-	// How good does the position need to be
-	private final double AbsoluteTolerance = 3;
-
 	// Brake state for telemetry
 	private boolean brakeState;
 
 	// First move indicates we have actually tried to move
 	// and the talon is now in a positioning mode.
 	private boolean madeFirstMove;
+	
+	// Count of the number of consecutive good position checks
+	private int goodPositionCount = 0;
 
 	// Labels for presets in robot prefs, config and on dashboard
 	public final String[] ArmPositionLabels = { 
@@ -233,12 +239,17 @@ public class Arm extends Subsystem {
 		}
 		 */
 		if (positionError <= AbsoluteTolerance) {
-			applyBrake();
-			return true;
+			goodPositionCount++;
+			if (goodPositionCount >= MinimumGoodPositions) {
+				applyBrake();
+				goodPositionCount = 0;
+				return true;
+			}
 		}
 		else {
-			return false;
+			goodPositionCount = 0;
 		}
+		return false;
 	}
 
 	// Returns the current position error
