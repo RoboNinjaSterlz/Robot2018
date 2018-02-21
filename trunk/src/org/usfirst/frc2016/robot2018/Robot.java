@@ -280,7 +280,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putNumber("Encoder Rate", driveTrainSRX.getAverageRate());
 
 		SmartDashboard.putString("PIMode", PIMode);
-		SmartDashboard.putBoolean("Cube Detector", RobotMap.cubeDetector.get());
+		SmartDashboard.putBoolean("Cube Detector", !RobotMap.cubeDetector.get());
 
 	}
 }
