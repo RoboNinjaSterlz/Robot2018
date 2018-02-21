@@ -95,7 +95,6 @@ public class OI {
 
 
         // SmartDashboard Buttons
-        SmartDashboard.putData("AutoCrossBaseline", new AutoCrossBaseline());
         SmartDashboard.putData("TestArcDrive: test 36 15", new TestArcDrive(0, 12836));
         SmartDashboard.putData("TurnLeftOrRight: false", new TurnLeftOrRight(false));
 
