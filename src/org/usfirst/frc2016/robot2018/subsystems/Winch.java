@@ -39,6 +39,7 @@ public class Winch extends Subsystem {
 	private final String WINCHMOTOR = "Winch Motor";
 	private boolean upperLimitDetected = false;
 	private boolean lowerLimitDetected = false;
+	private double lastSpeed;
 	/*
 	 * Values set by config
 	 */
@@ -107,6 +108,7 @@ public class Winch extends Subsystem {
 
 	public void variable(double speed) {
 			speed = -applyDeadband(speed, .05);
+			lastSpeed = speed;
 			SmartDashboard.putNumber("WinchSpeed", speed);
 		if (Robot.oi.operatorJoy.getRawButton(9)){
 			if (speed > 0) {
@@ -164,9 +166,15 @@ public class Winch extends Subsystem {
 	}
 	public void addTelemetryHeaders() {
 		Robot.currentMonitor.registerMonitorDevive(winchTalon, WINCHMOTOR);
+		Robot.telem.addColumn("Upper Limit Detector");
+		Robot.telem.addColumn("Lower Limit Detector");
+		Robot.telem.addColumn("Last Winch Speed");
 	}
 
 	public void writeTelemetyValues() {
+		Robot.telem.saveBoolean("Upper Limit Detector", winchUpperLimit.get());
+		Robot.telem.saveBoolean("Lower Limit Detector", winchLowerLimit.get());
+		Robot.telem.saveDouble("Last Winch Speed", lastSpeed);
 	}
 	public void loadConfig(Config config) {
 		//driveP = config.getDouble("DriveP", Defaults.DRIVETRAIN_P);
