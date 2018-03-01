@@ -81,6 +81,8 @@ public class Winch extends Subsystem {
 		}
 		if (!winchLowerLimit.get()) {
 			lowerLimitDetected = true;
+			//we know we are at the bottom, so it's safe to clear the upper flag
+			upperLimitDetected = false;
 		}
 		SmartDashboard.putBoolean("Winch Upper Limit", !winchUpperLimit.get());
 		SmartDashboard.putBoolean("Winch Lower Limit", !winchLowerLimit.get());
