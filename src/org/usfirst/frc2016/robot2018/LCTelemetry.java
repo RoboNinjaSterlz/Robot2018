@@ -82,7 +82,7 @@ public class LCTelemetry {
         dictColumnData = new HashMap<String, String>();
         driverStation = DriverStation.getInstance();
         bp_TimestampFile =  true;
-        sp_FilePath = "/var/volatile/tmp";					/** /var/volatile/tmp folder. Lost after reboot, /home/lvuser is writable.*/
+        sp_FilePath = "/telemetry/telem";					/** /var/volatile/tmp folder. Lost after reboot, /home/lvuser is writable.*/
         sp_FileName = "telemetry";
         dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         cal = Calendar.getInstance();
