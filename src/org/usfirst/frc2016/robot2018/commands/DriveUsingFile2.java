@@ -63,6 +63,10 @@ public class DriveUsingFile2 extends Command {
 				// Now we have a valid first point
 				break;
 			}
+			if (str == null) {
+				finished=true;
+				return;
+			}
 			// break it up 
 			String[] fields = str.split(csvSplitBy);
 
@@ -70,18 +74,13 @@ public class DriveUsingFile2 extends Command {
 				System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
 				failed=true;
 			}
-			if (str !=null) {
-				int leftDistance = Integer.parseInt(fields[0]);
-				int rightDistance = Integer.parseInt(fields[1]);
-				if (Robot.gameData == 'R') {
-					Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
-				}
-				else {
-					Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
-				}
+			int leftDistance = Integer.parseInt(fields[0]);
+			int rightDistance = Integer.parseInt(fields[1]);
+			if (Robot.gameData == 'R') {
+				Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
 			}
 			else {
-				finished=true;
+				Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
 			}
 		} catch (IOException e) {
 			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
@@ -106,24 +105,23 @@ public class DriveUsingFile2 extends Command {
 				break;
 			}
 			// break it up 
+			if (str == null) {
+				finished=true;
+				return;
+			}
 			String[] fields = str.split(csvSplitBy);
 
 			if (fields.length < 2){
 				System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
 				failed=true;
 			}
-			if (str !=null) {
-				int leftDistance = Integer.parseInt(fields[0]);
-				int rightDistance = Integer.parseInt(fields[1]);
-				if (Robot.gameData == 'R') {
-					Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
-				}
-				else {
-					Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
-				}
+			int leftDistance = Integer.parseInt(fields[0]);
+			int rightDistance = Integer.parseInt(fields[1]);
+			if (Robot.gameData == 'R') {
+				Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
 			}
 			else {
-				finished=true;
+				Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
 			}
 		} catch (IOException e) {
 			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
@@ -135,12 +133,18 @@ public class DriveUsingFile2 extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return (false || finished);
+		return (failed || finished);
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
+		try {
+			in.close();
+		} catch (IOException e) {
+			System.out.println("DriveUsingFile(): ****ERROR: Failed to close the file " + this.sp_FileName + 
+					"   Exception:" + e + "  Reason:" + e.getMessage() );
+		}
 	}
 
 	// Called when another command which requires one or more of the same
