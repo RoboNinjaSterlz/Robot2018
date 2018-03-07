@@ -74,6 +74,8 @@ public class Robot extends TimedRobot {
 	final String driveForward = "Drive Forward";
 	final String robotRightSide = "Robot Right";
 	final String robotLeftSide = "Robot Left";
+	final String robotLeftLongSide = "Robot Left Long";
+	final String robotRightLongSide = "Robot Right Long";
 	/*
 	 * What autonomous command to run
 	 * and options on the smart dashboard for auto
@@ -113,6 +115,8 @@ public class Robot extends TimedRobot {
 		RobotMap.init();
 		robotIsCalibrated = false;
 		robotPrefs = new RobotPrefs();
+		camServer = CameraServer.getInstance();
+		rearCamera=camServer.startAutomaticCapture("Switcher", 0);
 		config = new Config(CONFIG_FILE_NAME);
 		//loadConfig();
 		calAttemptTimer = 0;
@@ -169,6 +173,8 @@ public class Robot extends TimedRobot {
 		autoChooser.addDefault(robotCenter, new AutoStartCenter());
 		autoChooser.addDefault(robotLeftSide, new AutoStartLeft());
 		autoChooser.addDefault(robotRightSide, new AutoStartRight());
+		autoChooser.addDefault(robotLeftLongSide, new AutoStartLeftLongSide());
+		autoChooser.addDefault(robotRightLongSide, new AutoStartRightLongSide());
 		SmartDashboard.putData("Autonomous choices", autoChooser);
 
 		// instantiate the command used for the autonomous period
