@@ -54,80 +54,19 @@ public class DriveUsingFile2 extends Command {
 
 		try{
 			in = new BufferedReader(new FileReader(this.sp_FilePath+"/"+this.sp_FileName));
-			String str;
-			while ((str = in.readLine()) != null){
-				line ++;
-				str = str.trim();
-				if(str.length() == 0 || str.charAt(0) == '#')
-					continue;
-				// Now we have a valid first point
-				break;
-			}
-			if (str == null) {
-				finished=true;
-				return;
-			}
-			// break it up 
-			String[] fields = str.split(csvSplitBy);
+			sendNextPairToDrive();
 
-			if (fields.length < 2){
-				System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
-				failed=true;
-			}
-			int leftDistance = Integer.parseInt(fields[0]);
-			int rightDistance = Integer.parseInt(fields[1]);
-			if (Robot.gameData == 'R') {
-				Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
-			}
-			else {
-				Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
-			}
 		} catch (IOException e) {
 			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
 					"   Exception:" + e + "  Reason:" + e.getMessage() );
 			failed = true;
 		}
-
-
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		String str;
-		try{
-			while ((str = in.readLine()) != null){
-				line ++;
-				str = str.trim();
-				if(str.length() == 0 || str.charAt(0) == '#')
-					continue;
-				// Now we have a valid first point
-				break;
-			}
-			// break it up 
-			if (str == null) {
-				finished=true;
-				return;
-			}
-			String[] fields = str.split(csvSplitBy);
-
-			if (fields.length < 2){
-				System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
-				failed=true;
-			}
-			int leftDistance = Integer.parseInt(fields[0]);
-			int rightDistance = Integer.parseInt(fields[1]);
-			if (Robot.gameData == 'R') {
-				Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
-			}
-			else {
-				Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
-			}
-		} catch (IOException e) {
-			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
-					"   Exception:" + e + "  Reason:" + e.getMessage() );
-			failed = true;
-		}
+		sendNextPairToDrive();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -151,5 +90,42 @@ public class DriveUsingFile2 extends Command {
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
+	}
+
+	private void sendNextPairToDrive() {
+		String str;
+		try{
+			while ((str = in.readLine()) != null){
+				line ++;
+				str = str.trim();
+				if(str.length() == 0 || str.charAt(0) == '#')
+					continue;
+				// Now we have a valid first point
+				break;
+			}
+			// break it up 
+			if (str == null) {
+				finished=true;
+				return;
+			}
+			String[] fields = str.split(csvSplitBy);
+
+			if (fields.length < 2){
+				System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
+				failed=true;
+			}
+			double leftDistance = Double.parseDouble(fields[0]);
+			double rightDistance = Double.parseDouble(fields[1]);
+			if (Robot.gameData == 'R') {
+				Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
+			}
+			else {
+				Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
+			}
+		} catch (IOException e) {
+			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
+					"   Exception:" + e + "  Reason:" + e.getMessage() );
+			failed = true;
+		}
 	}
 }
