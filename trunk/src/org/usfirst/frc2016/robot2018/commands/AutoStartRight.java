@@ -46,6 +46,8 @@ public class AutoStartRight extends CommandGroup {
         addSequential(new ResetGyro());
         addSequential(new GetGameData());
         addSequential(new MagicDrive(0, -106, 0));
+        addParallel(new DriveStraightForDistance(-.35, 0));
+        addSequential(new DelaySeconds(.25));
         addSequential(new PlaceOrNot("R"));
         addSequential(new MagicDrive(0, 38, 0));
         addSequential(new ArcadeDrive(0, 90, 0));
