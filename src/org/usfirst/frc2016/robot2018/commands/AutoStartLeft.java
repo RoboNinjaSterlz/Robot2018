@@ -45,7 +45,7 @@ public class AutoStartLeft extends CommandGroup {
         addSequential(new DelaySeconds(.5));
         addSequential(new ResetGyro());
         addSequential(new GetGameData());
-        addSequential(new MagicDrive(0, -102, 0));
+        addSequential(new MagicDrive(0, -106, 0));
         addSequential(new PlaceOrNot("L"));
         addSequential(new MagicDrive(0, 38, 0));
         addSequential(new ArcadeDrive(0, -90, 0));

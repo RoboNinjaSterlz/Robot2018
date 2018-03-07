@@ -80,7 +80,7 @@ public class Winch extends Subsystem {
 			upperLimitDetected = true;
 		}
 		if (!winchLowerLimit.get()) {
-			lowerLimitDetected = true;
+			lowerLimitDetected = false;
 			//we know we are at the bottom, so it's safe to clear the upper flag
 			upperLimitDetected = false;
 		}
