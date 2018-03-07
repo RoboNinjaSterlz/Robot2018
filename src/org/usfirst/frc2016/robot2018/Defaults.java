@@ -44,7 +44,7 @@ public class Defaults {
     // Wheel Speeds
     public static final double WHEELSPEED_SHOOT = 1;
     public static final double WHEELSPEED_IN = .5;
-    public static final double WHEELSPEED_OUT = .5;
+    public static final double WHEELSPEED_OUT = .7;
     public static final double WHEELSPEED_ROTATE = .3;
     public static final double WHEELSPEED_HOLD = .2;
     // Winch presets
