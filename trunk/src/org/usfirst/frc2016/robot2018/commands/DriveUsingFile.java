@@ -50,6 +50,8 @@ public class DriveUsingFile extends Command {
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
+		failed = false;
+		finished = false;
 		System.out.println("MoveUsingFile(): INFO: Loading points from file [" + this.sp_FileName + "]");
 
 		try{
