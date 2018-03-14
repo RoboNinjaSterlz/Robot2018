@@ -173,6 +173,7 @@ public class Arm extends Subsystem {
 		//armTalon.set(ControlMode.MotionMagic, presetPositions[HIGH]);
 		//-goToPreset(HIGH);
 		applyBrake();
+		lastPreset = -1;
 	}
 
 
@@ -188,7 +189,6 @@ public class Arm extends Subsystem {
 		releaseBrake();
 		armTalon.set(ControlMode.MotionMagic, height);
 		madeFirstMove = true;
-
 	}
 
 	// Go to one of the preset positions
@@ -275,6 +275,10 @@ public class Arm extends Subsystem {
 		else {
 			return -1;
 		}
+	}
+	
+	public int getLastPreset() {
+		return lastPreset;
 	}
 
 	public void applyBrake() {

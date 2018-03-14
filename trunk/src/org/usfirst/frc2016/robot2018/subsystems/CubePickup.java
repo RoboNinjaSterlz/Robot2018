@@ -48,6 +48,7 @@ public class CubePickup extends Subsystem {
 
 	private boolean shootCubeActive = false;
 	private boolean ejectCubeActive = false;
+	private boolean acquireCubeActive = false;
 	
 	// Value from point of view control on joy stick.
 	public int pov;
@@ -144,6 +145,10 @@ public class CubePickup extends Subsystem {
 			rightWheel = wheelSpeedOut;
 			
 		}
+		else if (acquireCubeActive) {
+			leftWheel = -wheelSpeedIn;
+			rightWheel = -wheelSpeedIn;
+		}		
 		else {
 			pov = Robot.oi.operatorJoy.getPOV();
 
@@ -263,12 +268,24 @@ public class CubePickup extends Subsystem {
 	public void endShoot(){
 		shootCubeActive = false;
 	}
+	
 	public void autoEjectCube() {
 		ejectCubeActive = true;
 	}
 	
 	public void autoEndEjectCube() {
 		ejectCubeActive = false;
+	}
+	
+	public void acquireCube() {
+		acquireCubeActive = true;
+	}
+	
+	
+	public void autoEnd() {
+		acquireCubeActive = false;
+		ejectCubeActive = false;
+		shootCubeActive = false;
 	}
 }
 
