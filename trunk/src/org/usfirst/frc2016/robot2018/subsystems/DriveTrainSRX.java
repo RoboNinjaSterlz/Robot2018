@@ -580,6 +580,32 @@ public class DriveTrainSRX extends Subsystem {
 		stuckCount = 0;
 	}
 	
+	public void goTo(double leftDistance, double rightDistance) {
+		int distanceAsCountsLeft;
+		int distanceAsCountsRight;
+		int leftCruiseVelocity = cruiseVelocity;
+		int rightCruiseVelocity = cruiseVelocity;
+		int leftAccel = acceleration;
+		int rightAccel = acceleration;
+		double distanceRatio;
+
+		// convert absolute distance into absolute encoder counts
+		distanceAsCountsLeft = (int)Math.round(leftDistance * COUNTS_PER_INCH);
+		distanceAsCountsRight = (int)Math.round(rightDistance * COUNTS_PER_INCH);
+
+		// Don't reset the counters since it is not reliable
+		finalLeft = distanceAsCountsLeft + getLeftEncoder();
+		finalRight = distanceAsCountsRight + getRightEncoder();
+
+		// Now adjust the speed for the distance difference
+		distanceAsCountsLeft = Math.abs(distanceAsCountsLeft);
+		distanceAsCountsRight = Math.abs(distanceAsCountsRight);
+	
+		talonDriveLeft1.set(ControlMode.Position, finalLeft);
+		talonDriveRight1.set(ControlMode.Position, finalRight);
+		stuckCount = 0;
+	}
+
 	public void goToDistance(double leftDistance, double rightDistance) {
 		// convert absolute distance into absolute encoder counts
 		int distanceAsCountsLeft = (int)Math.round(leftDistance * COUNTS_PER_INCH);
