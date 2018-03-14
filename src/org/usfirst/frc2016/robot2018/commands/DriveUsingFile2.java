@@ -10,6 +10,7 @@
 
 
 package org.usfirst.frc2016.robot2018.commands;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
 import org.usfirst.frc2016.robot2018.Robot;
@@ -17,6 +18,9 @@ import org.usfirst.frc2016.robot2018.Robot;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  *
@@ -25,10 +29,214 @@ public class DriveUsingFile2 extends Command {
 	private String sp_FileName= "centermove.csv";    /** Default: centermove.csv */
 	private String sp_FilePath= "/c";				/** Default: /c folder. */
 	private final String csvSplitBy = ",";
-	private Integer line = 0; 
-	private BufferedReader in;
-	private boolean failed = false;
-	private boolean finished = false;
+	
+	public Double SecondsPerExecute = .02;
+	
+	public Double MaxVel = 15.0;
+	public Double MaxAccel = 4.0;
+	public Double MaxDistance = 150.0;
+	public Timer elapsedTime;
+	
+	private ArrayList<MoveSegment> moveList;
+	private Integer moveListIndex;
+	private Integer executeCount;
+	private DrivePosition posLeft;
+	private DrivePosition posRight;
+
+	private Boolean failed = false;
+	private Boolean finished = false;
+	
+	private enum AutoCmd { NotFound, Left, Right, ResetPos, Close, Open, PullIn, Eject, StopIntake, ArmFloor, ArmHigh, Stop }
+	private enum MoveDir { None, Plus, Minus }
+	
+	private class DrivePosition {
+		private DriveUsingFile2 parent;
+		private String name;
+		private Double startDistance;
+		private Double distance;
+		private Double velocity;
+		private Double accel;
+		private Double targetAccel;
+		private Double targetVelocity;
+		private Double targetDistance;
+		private MoveDir dirDistance;
+		private MoveDir dirVelocity;
+		
+		public DrivePosition(DriveUsingFile2 parent, String name) {
+			this.parent = parent;
+			this.name = name;
+		}
+		
+		public void setStartDistance(double dist) {
+			startDistance = dist;
+			distance = 0.0;
+			velocity = 0.0;
+			accel = 0.0;
+			targetDistance = 0.0;
+			targetVelocity = 0.0;
+			targetAccel = 0.0;
+			dirDistance = MoveDir.None;
+			dirVelocity = MoveDir.None;
+		}
+		
+		public void setTarget(double newAccel, double newMaxVel, double newDist)
+		{
+			newAccel = Math.abs(newAccel);
+			if (newAccel == 0 || newAccel > parent.MaxAccel) 
+				newAccel = parent.MaxAccel;
+			targetAccel = newAccel;
+		
+			newMaxVel = Math.abs(newMaxVel);
+			if (newMaxVel==0 || newMaxVel > parent.MaxVel )
+				newMaxVel = parent.MaxVel;
+			targetVelocity = newMaxVel;
+			
+			if (newDist == distance) {
+				dirDistance = MoveDir.None;
+				dirVelocity = MoveDir.None;
+				velocity = 0.0;
+				accel = 0.0;
+			} 
+			else if (newDist > distance) {
+				dirDistance = MoveDir.Plus;
+				if (targetVelocity > velocity)
+				{
+					accel = targetAccel;
+					dirVelocity = MoveDir.Plus;
+				}
+				else
+				{
+					accel = -targetAccel;
+					dirVelocity = MoveDir.Minus;
+				}
+			}
+			else { // newDist < distance
+				dirDistance = MoveDir.Minus;
+				if (-targetVelocity > velocity)
+				{
+					accel = targetAccel;
+					dirVelocity = MoveDir.Plus;
+				}
+				else
+				{
+					accel = -targetAccel;
+					dirVelocity = MoveDir.Minus;
+				}
+			}
+		}
+		
+		public double updatePosition() {
+			if (dirDistance == MoveDir.None)
+			{
+				return startDistance + distance;
+			}
+			
+			double dt = parent.SecondsPerExecute;
+			Double newDistance = distance + velocity * dt + 0.5 * accel * dt * dt;
+			Double newVelocity = velocity + accel * dt;
+			
+			Double absDistance = Math.abs(newDistance);
+			if (absDistance > parent.MaxDistance) {
+				parent.shutdown();
+				System.out.println(name + ": distance (" + absDistance + ") exceeded MaxDistance (" + parent.MaxDistance + ")");
+				return startDistance + distance;
+			}
+			
+			if (dirDistance == MoveDir.Plus) {
+				if (newDistance >= targetDistance) {
+					// stop when the target point is reached
+					dirDistance = MoveDir.None;
+					newDistance = targetDistance;
+					newVelocity = 0.0;
+					accel = 0.0;
+					System.out.println(name + ".Plus: at targetDistance (" + targetDistance + ")");
+				}
+				else {
+					if (newVelocity > targetVelocity) {
+						// limit velocity
+						newVelocity = targetVelocity;
+						newDistance = distance + velocity * dt;
+						accel = 0.0;					
+						System.out.println(name + ".Plus: at targetVelocity (" + targetVelocity + ")");
+					}
+					// calculate where to start slowing down
+					Double stopDt = dt * Math.round(newVelocity/(targetAccel*dt));
+					Double brakeAt = targetDistance - 0.5 * targetAccel * stopDt * stopDt;
+					if (newDistance >= brakeAt)
+					{
+						// begin to slow down to stop at the target
+						newDistance = brakeAt;
+						accel = -targetAccel;
+						System.out.println(name + ".Plus: braking (" + brakeAt + ") for " + stopDt + " secs");
+					}
+					
+					System.out.println(name + ".Plus: a=" + accel + " v=" + newVelocity + " d=" + newDistance);
+				}
+
+			}
+			else { // direction == MoveDir.Minus
+				if (newDistance < targetDistance) {
+					dirDistance = MoveDir.None;
+					newDistance = targetDistance;
+					newVelocity = 0.0;
+					accel = 0.0;
+					System.out.println(name + ".Minus: at targetDistance (" + targetDistance + ")");
+				}
+				else {
+					if (newVelocity < -targetVelocity)
+					{
+						// limit velocity
+						newVelocity = -targetVelocity;
+						newDistance = distance + newVelocity * dt;
+						accel = 0.0;					
+						System.out.println(name + ".Minus: at targetVelocity (" + targetVelocity + ")");
+					}
+					// calculate where to start slowing down
+					Double stopDt = dt * Math.round(newVelocity/(targetAccel*dt));
+					Double brakeAt = targetDistance + 0.5 * targetAccel * stopDt * stopDt;
+					if (newDistance <= brakeAt)
+					{
+						// begin to slow down to stop at the target
+						newDistance = brakeAt;
+						accel = targetAccel;
+						System.out.println(name + ".Minus: braking (" + brakeAt + ") for " + stopDt + " secs");
+					}
+					
+					System.out.println(name + ".Minus: a=" + accel + " v=" + newVelocity + " d=" + newDistance);
+				}
+			}
+			distance = newDistance;
+			velocity = newVelocity;
+			return startDistance + distance;
+		}
+	}
+	
+
+	public class MoveSegment {
+		public int lineNumber;
+		public double time;
+		public AutoCmd command;
+		public double targetAccel;
+		public double targetVelocity;
+		public double targetDistance;
+		
+		public MoveSegment(int line, double t, AutoCmd cmd, double a, double v, double d)
+		{
+			lineNumber = line;
+			time = t; 
+			command = cmd;
+			targetAccel = a;
+			targetVelocity = v;
+			targetDistance = d;
+		}
+		
+		public MoveSegment(int line, double t, AutoCmd cmd)
+		{
+			lineNumber = line;
+			time = t; 
+			command = cmd;
+		}
+	}
 
 	// BEGIN AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=VARIABLE_DECLARATIONS
 
@@ -42,9 +250,12 @@ public class DriveUsingFile2 extends Command {
 
 		// END AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=VARIABLE_SETTING
 		// BEGIN AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=REQUIRES
-		requires(Robot.driveTrainSRX);
+
 
 		// END AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=REQUIRES
+		posLeft = new DrivePosition(this, "Left");
+		posRight = new DrivePosition(this, "Right");
+		moveList = new ArrayList<MoveSegment>();
 	}
 
 	// Called just before this Command runs the first time
@@ -53,20 +264,85 @@ public class DriveUsingFile2 extends Command {
 		System.out.println("MoveUsingFile(): INFO: Loading points from file [" + this.sp_FileName + "]");
 
 		try{
-			in = new BufferedReader(new FileReader(this.sp_FilePath+"/"+this.sp_FileName));
-			sendNextPairToDrive();
+			moveList = new ArrayList<MoveSegment>();
+			String str;
+			Integer line = 0;
+			BufferedReader in = new BufferedReader(new FileReader(this.sp_FilePath+"/"+this.sp_FileName));
+			
+			while ((str = in.readLine()) != null) {
+				line ++;
+				str = str.trim();
+				if(str.length() == 0 || str.charAt(0) == '#')
+					continue;
+				
+				String[] fields = str.split(csvSplitBy);
 
+				if (fields.length < 2){
+					System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
+					failed=true;
+				}
+				
+				double time = Double.parseDouble(fields[0].trim());
+				
+				String cmdName = fields[1].trim(); 
+				AutoCmd cmd = AutoCmd.NotFound;
+				for(AutoCmd cmdFind : AutoCmd.values())	{
+					if (cmdName == cmdFind.name()) {
+						cmd = cmdFind;
+					}
+				}
+				
+				if(cmd==AutoCmd.NotFound)
+				{
+					System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " command '" + fields[1] + "' not found");
+					failed=true;					
+				}
+				
+				// { NotFound, Left, Right, ResetPos, Close, Open, PullIn, Eject, StopIntake, ArmFloor, ArmHigh, Stop }
+				switch(cmd)
+				{
+				case Left:
+				case Right:
+					if (fields.length < 5) {
+						System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " Left/Right is missing accel,targetVel,targetPos fields!");
+						failed=true;
+					}
+					double a = Double.parseDouble(fields[2].trim());
+					double v = Double.parseDouble(fields[3].trim());
+					double d = Double.parseDouble(fields[4].trim());
+					moveList.add(new MoveSegment(line, time, cmd, a, v, d));
+					break;
+					
+				default:
+					moveList.add(new MoveSegment(line, time, cmd));
+					break;
+				}
+
+			}
+			in.close();
+			
 		} catch (IOException e) {
 			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
 					"   Exception:" + e + "  Reason:" + e.getMessage() );
 			failed = true;
 		}
+
+
+		setStartDistance();
+		executeCount = 0;
+		moveListIndex = 0;
+		elapsedTime = new Timer();
+		elapsedTime.start();
+		
+		processCommands();
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		sendNextPairToDrive();
+		executeCount++;
+		processCommands();
+		updateDriveTrain();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -78,54 +354,113 @@ public class DriveUsingFile2 extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		try {
-			in.close();
-		} catch (IOException e) {
-			System.out.println("DriveUsingFile(): ****ERROR: Failed to close the file " + this.sp_FileName + 
-					"   Exception:" + e + "  Reason:" + e.getMessage() );
-		}
+		shutdown();
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	@Override
 	protected void interrupted() {
+		shutdown();
 	}
-
-	private void sendNextPairToDrive() {
-		String str;
-		try{
-			while ((str = in.readLine()) != null){
-				line ++;
-				str = str.trim();
-				if(str.length() == 0 || str.charAt(0) == '#')
-					continue;
-				// Now we have a valid first point
-				break;
-			}
-			// break it up 
-			if (str == null) {
-				finished=true;
-				return;
-			}
-			String[] fields = str.split(csvSplitBy);
-
-			if (fields.length < 2){
-				System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
-				failed=true;
-			}
-			double leftDistance = Double.parseDouble(fields[0]);
-			double rightDistance = Double.parseDouble(fields[1]);
+	
+	private void shutdown()
+	{
+		finished = true;
+		failed = true;
+		Robot.cubePickup.autoEnd();
+		Robot.driveTrainSRX.driveStop();
+	}
+	
+	private void setStartDistance()
+	{
+		posLeft.setStartDistance(Robot.driveTrainSRX.getLeftDistance());
+		posRight.setStartDistance(Robot.driveTrainSRX.getRightDistance());
+	}
+	
+	private void updateDriveTrain()
+	{
+		Robot.driveTrainSRX.pingDifferentialDrive();
+		
+		double leftDistance = posLeft.updatePosition();
+		double rightDistance = posRight.updatePosition();
+		if (!failed)
+		{
 			if (Robot.gameData == 'R') {
-				Robot.driveTrainSRX.goToUsingMM(leftDistance, rightDistance);
+				Robot.driveTrainSRX.goToDistance(rightDistance, leftDistance);
 			}
 			else {
-				Robot.driveTrainSRX.goToUsingMM(rightDistance, leftDistance);
+				Robot.driveTrainSRX.goToDistance(leftDistance, rightDistance);
 			}
-		} catch (IOException e) {
-			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
-					"   Exception:" + e + "  Reason:" + e.getMessage() );
-			failed = true;
 		}
+	}
+
+	private void processCommands() {
+		Double tickNow = executeCount * SecondsPerExecute;
+		Double timerNow = elapsedTime.get();
+		System.out.println("processCommands: tick time=" + tickNow.toString() + " timer= " + timerNow.toString());
+		
+		while(moveListIndex < moveList.size()) {
+			MoveSegment moveSeg = moveList.get(moveListIndex);
+			if (moveSeg.time >= tickNow) {
+				break;
+			}
+			moveListIndex++;
+			
+			System.out.println("processCommands: Executing Line " + moveSeg.lineNumber + ": " + moveSeg.command.name());
+			// NotFound, Left, Right, ResetPos, Close, Open, PullIn, Eject, StopIntake, ArmFloor, ArmHigh
+			switch(moveSeg.command)
+			{
+			default:
+				System.out.println("processCommands: " + moveSeg.command.name() + " not handled");
+				break;
+				
+			case Left:
+				posLeft.setTarget(moveSeg.targetAccel, moveSeg.targetVelocity, moveSeg.targetDistance);
+				break;
+				
+			case Right:
+				posRight.setTarget(moveSeg.targetAccel, moveSeg.targetVelocity, moveSeg.targetDistance);
+				break;	
+				
+			case ResetPos:
+				setStartDistance();
+				break;
+				
+			case Close:
+				Robot.cubePickup.closeArms();
+				break;
+				
+			case Open:
+				Robot.cubePickup.openArms();
+				break;
+				
+			case PullIn:
+				Robot.cubePickup.acquireCube();
+				break;
+				
+			case Eject:
+				Robot.cubePickup.autoEjectCube();
+				break;
+				
+			case StopIntake:
+				Robot.cubePickup.autoEnd();
+				break;
+				
+			case ArmFloor:
+				Robot.arm.goToPreset(Robot.arm.FLOOR);
+				break;
+				
+			case ArmHigh:
+				Robot.arm.goToPreset(Robot.arm.HIGH);
+				break;
+				
+			case Stop:
+				moveListIndex = moveList.size();
+				break;
+			}
+			
+		}
+		finished = moveListIndex >= moveList.size();
 	}
 }

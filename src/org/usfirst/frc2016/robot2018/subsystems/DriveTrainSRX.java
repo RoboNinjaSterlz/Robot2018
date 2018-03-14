@@ -56,8 +56,14 @@ public class DriveTrainSRX extends Subsystem {
 	private final double SPEED_I = .05;
 	private final double speedFeedForward = .6;
 	private final double COUNTS_PER_INCH = 4096/12.57;  //Encoder counts / inch of travel
+	
+	
+	// parameters for determining when move is completed
 	private final int MAX_POSITION_ERROR = 40;
-
+	private final int STUCK_ENCODER_LIMIT = 10; // counts changing less than limit are considered 'stuck'
+	private final int STUCK_MAX_COUNT =  20; // number of periodic scans before indicating 'stuck'
+    private final int STUCK_START_IGNORE = 25; // number of periodic scans before detecting 'stuck'
+    
 	/*
 	 * The following block of variables are used to hold values loaded from
 	 * NV RAM by RobotPrefs.
@@ -83,7 +89,7 @@ public class DriveTrainSRX extends Subsystem {
 
 	private double lastJoyLeft, lastJoyRight;
 	private String lastDriveMode;
-	private double lastRightCount, lastLeftCount;
+	private double lastRightCount, lastLeftCount, stuckCount, stuckStartCount;
 	private double accumSpeed =0;
 	StringBuilder _sb = new StringBuilder();
 	int _loops = 0;
@@ -514,8 +520,11 @@ public class DriveTrainSRX extends Subsystem {
 		// Reset the speed in case someone else changed it.
 		talonDriveLeft1.configMotionCruiseVelocity(cruiseVelocity, 0);
 		talonDriveRight1.configMotionCruiseVelocity(cruiseVelocity, 0);
+		talonDriveLeft1.configMotionAcceleration(acceleration, 0);
+		talonDriveLeft1.configMotionAcceleration(acceleration, 0);
 		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
 		talonDriveRight1.set(ControlMode.MotionMagic, finalRight);
+		stuckCount = 0;
 		/*
 		 * Will need to disable motorSafetyHepler when not using differentialDrive Calls
 		 */
@@ -523,36 +532,38 @@ public class DriveTrainSRX extends Subsystem {
 		//	SmartDashboard.putNumber("Distance in Counts", distanceAsCounts);
 	}
 
-	public void goToUsingMM(double  leftDistance, double rightDistance) {
+	public void goToUsingMM(double leftDistance, double rightDistance) {
 		int distanceAsCountsLeft;
 		int distanceAsCountsRight;
-		int leftCruiseVelocity;
-		int rightCruiseVelocity;
+		int leftCruiseVelocity = cruiseVelocity;
+		int rightCruiseVelocity = cruiseVelocity;
+		int leftAccel = acceleration;
+		int rightAccel = acceleration;
 		double distanceRatio;
 
 		// convert absolute distance into absolute encoder counts
 		distanceAsCountsLeft = (int)Math.round(leftDistance * COUNTS_PER_INCH);
 		distanceAsCountsRight = (int)Math.round(rightDistance * COUNTS_PER_INCH);
 
-		// Dont reset the counters since it is not reliable
+		// Don't reset the counters since it is not reliable
 		finalLeft = distanceAsCountsLeft + getLeftEncoder();
 		finalRight = distanceAsCountsRight + getRightEncoder();
 
 		// Now adjust the speed for the distance difference
-		// prevent division by zero
-		if (rightDistance == 0 || leftDistance == 0) {
-			distanceRatio = 1;
-		}
-		else {
-			distanceRatio = leftDistance/rightDistance;
-		}
-		if (distanceRatio > 1) {
+		distanceAsCountsLeft = Math.abs(distanceAsCountsLeft);
+		distanceAsCountsRight = Math.abs(distanceAsCountsRight);
+		
+		if (distanceAsCountsLeft < distanceAsCountsRight)
+		{
+			distanceRatio = (double)distanceAsCountsLeft / (double)distanceAsCountsRight;
 			leftCruiseVelocity = (int)Math.round(cruiseVelocity * distanceRatio);
-			rightCruiseVelocity = cruiseVelocity;
+			leftAccel = (int)Math.round(acceleration * distanceRatio );
 		}
-		else {
-			leftCruiseVelocity = cruiseVelocity;
-			rightCruiseVelocity = (int)Math.round(cruiseVelocity/distanceRatio);
+		else if (distanceAsCountsRight < distanceAsCountsLeft)
+		{
+			distanceRatio = (double)distanceAsCountsRight / (double)distanceAsCountsLeft;
+			rightCruiseVelocity = (int)Math.round(cruiseVelocity * distanceRatio);
+			rightAccel = (int)Math.round(acceleration * distanceRatio );
 		}
 
 		// Reset the speed in case someone else changed it.
@@ -560,9 +571,24 @@ public class DriveTrainSRX extends Subsystem {
 		//SmartDashboard.putNumber("Distance in Counts", distanceAsCountsRight);
 		talonDriveLeft1.configMotionCruiseVelocity(leftCruiseVelocity, 0);
 		talonDriveRight1.configMotionCruiseVelocity(rightCruiseVelocity, 0);
+		
+		talonDriveLeft1.configMotionAcceleration(leftAccel, 0);
+		talonDriveLeft1.configMotionAcceleration(rightAccel, 0);
+		
 		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
 		talonDriveRight1.set(ControlMode.MotionMagic, finalRight);
+		stuckCount = 0;
 	}
+	
+	public void goToDistance(double leftDistance, double rightDistance) {
+		// convert absolute distance into absolute encoder counts
+		int distanceAsCountsLeft = (int)Math.round(leftDistance * COUNTS_PER_INCH);
+		int distanceAsCountsRight = (int)Math.round(rightDistance * COUNTS_PER_INCH);
+		talonDriveLeft1.set(ControlMode.Position, distanceAsCountsLeft);
+		talonDriveRight1.set(ControlMode.Position, distanceAsCountsRight);
+		stuckCount = 0;
+	}
+
 
 	public void pingDifferentialDrive() {
 		differentialDrive.pingMotorSafety();
@@ -573,14 +599,33 @@ public class DriveTrainSRX extends Subsystem {
 	 * when the move has completed
 	 */
 	public boolean moveComplete() {
-		boolean leftGood = Math.abs(finalLeft - getLeftEncoder()) < MAX_POSITION_ERROR;
-		boolean rightGood = Math.abs(finalRight - getRightEncoder()) < MAX_POSITION_ERROR;
+		int leftEncoder =  getLeftEncoder();
+		int rightEncoder = getRightEncoder();
+		boolean leftGood = Math.abs(finalLeft - leftEncoder) < MAX_POSITION_ERROR;
+		boolean rightGood = Math.abs(finalRight - rightEncoder) < MAX_POSITION_ERROR;
+		
+	    boolean stuck = false;
+		if (stuckStartCount < STUCK_START_IGNORE) {
+			stuckStartCount++;
+		}
+		else if (stuckCount < STUCK_MAX_COUNT) {
+			stuckCount++;
+			if (Math.abs(lastLeftCount - leftEncoder) > STUCK_ENCODER_LIMIT || Math.abs(lastRightCount - rightEncoder) > STUCK_ENCODER_LIMIT) {
+				stuckCount = 0;
+			}
+		}
+		else {
+			stuck = true;
+		}
+			
+		lastLeftCount = leftEncoder;
+		lastRightCount = rightEncoder;
 		//  SmartDashboard.putNumber("TalonDriveRight position", finalRight);
 		//SmartDashboard.putBoolean("Right Good", rightGood);
 		//SmartDashboard.putBoolean("Left Good", leftGood);
-		SmartDashboard.putNumber("Left Error", finalLeft - getLeftEncoder());
-		SmartDashboard.putNumber("Right Error", finalRight - getRightEncoder());
-		return (leftGood && rightGood);
+		SmartDashboard.putNumber("Left Error", finalLeft - leftEncoder);
+		SmartDashboard.putNumber("Right Error", finalRight - rightEncoder);
+		return stuck || (leftGood && rightGood);
 	}
 	/*
 	 * Returns the average encoder rate of left and right 
@@ -642,12 +687,19 @@ public class DriveTrainSRX extends Subsystem {
 	}
 
 	public int getRightEncoder() {
-
 		return talonDriveRight1.getSelectedSensorPosition(0);
 	}
 
 	public int getLeftEncoder() {
 		return talonDriveLeft1.getSelectedSensorPosition(0);
+	}
+
+	public double getRightDistance() {
+		return (double)getRightEncoder() / COUNTS_PER_INCH;
+	}
+	
+	public double getLeftDistance()	{
+		return (double)getLeftEncoder() / COUNTS_PER_INCH;
 	}
 
 	public void resetEncoders() {
