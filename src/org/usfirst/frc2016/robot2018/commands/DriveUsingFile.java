@@ -287,8 +287,9 @@ public class DriveUsingFile extends Command {
 				String cmdName = fields[1].trim(); 
 				AutoCmd cmd = AutoCmd.NotFound;
 				for(AutoCmd cmdFind : AutoCmd.values())	{
-					if (cmdName == cmdFind.name()) {
+					if (cmdFind.name().equals(cmdName)) {
 						cmd = cmdFind;
+						break;
 					}
 				}
 				
