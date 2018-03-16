@@ -76,6 +76,9 @@ public class Robot extends TimedRobot {
 	final String robotLeftSide = "Robot Left";
 	final String robotLeftLongSide = "Robot Left Long";
 	final String robotRightLongSide = "Robot Right Long";
+	final String robotLeft45 = "Robot Left45";
+	final String robotRight45 = "Robot Right45";
+	
 	/*
 	 * What autonomous command to run
 	 * and options on the smart dashboard for auto
@@ -175,6 +178,8 @@ public class Robot extends TimedRobot {
 		autoChooser.addDefault(robotRightSide, new AutoStartRight());
 		autoChooser.addDefault(robotLeftLongSide, new AutoStartLeftLongSide());
 		autoChooser.addDefault(robotRightLongSide, new AutoStartRightLongSide());
+		autoChooser.addDefault(robotLeft45, new AutoLeft45());
+		autoChooser.addDefault(robotRight45, new AutoRight45());
 		SmartDashboard.putData("Autonomous choices", autoChooser);
 
 		// instantiate the command used for the autonomous period
