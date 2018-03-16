@@ -68,7 +68,7 @@ public class DriveStraightForDistance extends Command {
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	boolean done = false;
-    	done = (m_distance <= Math.abs((Robot.driveTrainSRX.getRightEncoder() - rEncoderStart)));
+    	done = (Math.abs(m_distance) <= Math.abs((Robot.driveTrainSRX.getRightEncoder() - rEncoderStart)));
     	if (!done) {
     		done = (waitCounter >= (int)(TIMEOUT/DELAYPERCOUNT));
     	}
