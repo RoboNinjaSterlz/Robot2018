@@ -11,7 +11,11 @@
 
 package org.usfirst.frc2016.robot2018.subsystems;
 
+import org.usfirst.frc2016.robot2018.Config;
+import org.usfirst.frc2016.robot2018.Defaults;
 import org.usfirst.frc2016.robot2018.Robot;
+import org.usfirst.frc2016.robot2018.Config;
+
 
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -26,8 +30,8 @@ import edu.wpi.first.wpilibj.SPI;
  */
 public class Gyro extends Subsystem {
 	
-	public final double gyroP = 0.095;
-	public final double TURN_MAX = 0.35;
+	public double gyroP = 0.095;
+	public double gyroTurnMax = 0.35;
 	private final String GYRO_ANGLE = "Gyro Angle";
 	private final String GYRO_ROLL = "Gyro Roll";
 
@@ -86,6 +90,12 @@ public class Gyro extends Subsystem {
     	Robot.telem.saveDouble(GYRO_ANGLE, getAngle());
     	Robot.telem.saveDouble(GYRO_ROLL, getRoll());
     }
+
+	public void loadConfig(Config config) {
+		gyroP = config.getDouble("gyroP", Defaults.GYROP);
+		gyroTurnMax = config.getDouble("gryoTurnMax", Defaults.GYROTURNMAX);
+	}
+	
     public void calibrate() {
     	//imu.calibrate();
     	//gGyro.calibrate();

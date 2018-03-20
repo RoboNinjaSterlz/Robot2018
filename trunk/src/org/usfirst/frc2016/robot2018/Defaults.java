@@ -56,6 +56,10 @@ public class Defaults {
      public static final double AUT_ENCODER_DISTANCE_10FT = 100; //Distance in inches
      public static final double AUT_RIGHT_Y = -.8;
      public static final double AUT_LEFT_Y = .8;
+     
+     // Gyro
+     public static final double GYROP = .095;
+     public static final double GYROTURNMAX = .35;
 
 
 }

@@ -68,11 +68,11 @@ public class ArcadeDrive extends Command {
     	}
     	steer *= -Robot.gyro.gyroP;
     	
-    	if (steer > Robot.gyro.TURN_MAX) {
-    		steer = Robot.gyro.TURN_MAX;
+    	if (steer > Robot.gyro.gyroTurnMax) {
+    		steer = Robot.gyro.gyroTurnMax;
     	}
-    	else if (steer < -Robot.gyro.TURN_MAX) {
-    		steer = -Robot.gyro.TURN_MAX;
+    	else if (steer < -Robot.gyro.gyroTurnMax) {
+    		steer = -Robot.gyro.gyroTurnMax;
     	}
     	if (m_speed== 0) {
     		//Use the joystick or stop if centered
