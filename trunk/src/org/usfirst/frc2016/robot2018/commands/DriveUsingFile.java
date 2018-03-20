@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.usfirst.frc2016.robot2018.Robot;
 
@@ -25,219 +26,38 @@ import org.usfirst.frc2016.robot2018.Robot;
  *
  */
 public class DriveUsingFile extends Command {
-	private String sp_FileName= "centermove.csv";    /** Default: centermove.csv */
-	private String sp_FilePath= "/c";				/** Default: /c folder. */
+	private String moveFileName = "centermove";    /** Default: centermove_L.csv */
+	
+	private String moveFilePath = "/c";				/** Default: /c folder. */
+	//-- private String filePath= "..\\robot2018\\trunk\\";
 	private final String csvSplitBy = ",";
+	private final String leftName = "L";
+	private final String rightName = "R";
 	
-	public Double SecondsPerExecute = .02;
+	public Double secondsPerExecute = .02;
 	
-	public Double MaxVel = 20.0;
-	public Double MaxAccel = 10.0;
-	public Double MaxDistance = 150.0;
-	public Timer elapsedTime;
+	public Double velocityLimit = 20.0;
+	public Double accelLimit = 10.0;
+	public Double distanceLimit = 150.0;
 	
-	private ArrayList<MoveSegment> moveList;
+	//** public Timer elapsedTime;
+	public long startNanoTime; // nanoseconds
+	public double moveStartTime;  // seconds
+
+	
+	private ArrayList<AutoSegment> moveList;
 	private Integer moveListIndex;
 	private Integer executeCount;
-	private DrivePosition posLeft;
-	private DrivePosition posRight;
+	private MotorPosition posLeft;
+	private MotorPosition posRight;
 
 	private Boolean failed = false;
 	private Boolean finished = false;
 	
 	private enum AutoCmd { NotFound, Left, Right, ResetPos, Close, Open, PullIn, Eject, StopIntake, ArmFloor, ArmHigh, Stop }
 	
-	private class DrivePosition {
-		private DriveUsingFile parent;  // DriveUsingFile object using this one
-		private Double offsetDistance;  // all moves are relative to the starting offset
-		private String name;			// display name for tracing
-		private Double distance; 		// absolute distance from startDistance
-		private Double velocity;		// current move velocity
-		private Double accel;			// current move acceleration
-		private Double targetAccel;     // acceleration to use for the current move
-		private Double targetVelocity;  // max velocity to use for the current move
-		private Double targetDistance;  // end point of the move
-		private Double startDistance;   // current distance at the start of the move (setOffsetDistance)
-		private Double moveLength;		// absolute length of current move
-		private Boolean isMoving;		// true when actively moving
-		private Boolean isForward;		// true when moving in a positive direction, flag simplifies the profile logic
-		
-		public DrivePosition(DriveUsingFile parent, String name) {
-			this.parent = parent;
-			this.name = name;
-		}
-				
-		public void setOffsetDistance(double dist) {
-			offsetDistance = dist;
-			endMove(0.0);
-		}
-		
-		public void endMove(double dist) {
-			startDistance = dist;
-			targetDistance = dist;
-			distance = 0.0;
-			velocity = 0.0;
-			accel = 0.0;
-			moveLength = 0.0;
-			isMoving = false;
-			isForward = false;
-			targetVelocity = parent.MaxVel;
-			targetAccel = parent.MaxAccel;			
-		}
-		
-		
-		public void setTarget(double newAccel, double newMaxVel, double newDist)
-		{
-			// default or limit accel
-			newAccel = Math.abs(newAccel);
-			if (newAccel == 0 || newAccel > parent.MaxAccel) 
-				newAccel = parent.MaxAccel;
-			targetAccel = newAccel;
-		
-			// default or limit vel
-			newMaxVel = Math.abs(newMaxVel);
-			if (newMaxVel==0 || newMaxVel > parent.MaxVel )
-				newMaxVel = parent.MaxVel;
-			
-			targetVelocity = newMaxVel;
-
-			// start distance the current location without the base offset
-			startDistance = getOffsetDistance() - offsetDistance;
-			targetDistance = newDist;
-			
-			
-			boolean newIsFoward = targetDistance > startDistance;
-			if (isForward != newIsFoward)
-			{
-				// new direction, change sign of current velocity
-				velocity = -velocity;
-			}
-			
-			// length and direction of the move
-			isForward = newIsFoward;
-			moveLength = Math.abs(targetDistance - startDistance);
-			
-			double dt = parent.SecondsPerExecute;
-			if (Math.abs(velocity) < targetAccel * dt && moveLength < targetAccel * dt * dt) {
-				// small move, just go there
-				endMove(newDist);
-			}
-			else
-			{
-				isMoving = true;
-				if (velocity > targetVelocity) {
-					// need to slow down to the new max
-					accel = -targetAccel;
-				}
-				if (velocity < targetVelocity) {
-					// need to speed up to new max
-					accel = targetAccel;
-				}
-			}
-		}
-		
-		// get the distance including the starting offset
-		public double getOffsetDistance() {
-			if (!isMoving) {
-				// not moving, return target
-				return offsetDistance + targetDistance;
-			}
-			
-			if (isForward) {
-				// moving forward, return start + distance moved
-				return offsetDistance + startDistance + distance;
-			}
-			
-			// moving backward, return start - distance moved
-			return offsetDistance + startDistance - distance;
-		}
-		
-		public double updatePosition() {
-			if (!isMoving)
-			{
-				return getOffsetDistance();
-			}
-			double dt = parent.SecondsPerExecute;
-			
-			// calculate next position based on current velocity and acceleration
-			
-			Double newAccel = accel;
-			Double newVelocity = velocity + newAccel * dt;
-			
-			if (newAccel > 0 && newVelocity >= targetVelocity) {
-				// accelerated to max positive velocity, limit
-				newVelocity = targetVelocity;
-				newAccel = 0.0;
-			} 
-			
-			if (newAccel < 0 && newVelocity <= targetVelocity) {
-				// de-accelerated to max positive velocity, limit
-				newVelocity = targetVelocity;
-				newAccel = 0.0;
-			}
-			
-			Double newDistance = distance + newVelocity * dt + 0.5 * newAccel * dt * dt;
-			if (newDistance > parent.MaxDistance) {
-				// safety check out of bounds
-				System.out.println(name + ": distance (" + newDistance + ") exceeded MaxDistance (" + parent.MaxDistance + ")");
-				endMove(distance);
-				parent.shutdown();
-				return getOffsetDistance();
-			}
-			
-			if (newDistance >= targetDistance) {
-				// stop when the target point is reached
-				endMove(targetDistance);
-				System.out.println(name + ": at targetDistance (" + targetDistance + ")");
-				return getOffsetDistance();
-			}
-			
-			// calculate where to start slowing down
-			Double stopDt = dt * Math.round(Math.abs(newVelocity)/(targetAccel*dt));
-			Double brakeAt = targetDistance - 0.5 * targetAccel * stopDt * stopDt;
-			if (newDistance >= brakeAt)
-			{
-				// begin to slow down to stop at the target
-				newAccel = -targetAccel;
-				System.out.println(name + ".Plus: braking (" + brakeAt + ") for " + stopDt + " secs");
-			}
-			
-			System.out.println(name + ": a=" + accel + " v=" + newVelocity + " d=" + newDistance);
-			
-			accel = newAccel;
-			distance = newDistance;
-			velocity = newVelocity;
-			return getOffsetDistance();
-		}
-	}
+	public enum ProfileState { Idle, Start, Coast, Stop, SpdUp, SpdDn }
 	
-
-	public class MoveSegment {
-		public int lineNumber;
-		public double time;
-		public AutoCmd command;
-		public double targetAccel;
-		public double targetVelocity;
-		public double targetDistance;
-		
-		public MoveSegment(int line, double t, AutoCmd cmd, double a, double v, double d)
-		{
-			lineNumber = line;
-			time = t; 
-			command = cmd;
-			targetAccel = a;
-			targetVelocity = v;
-			targetDistance = d;
-		}
-		
-		public MoveSegment(int line, double t, AutoCmd cmd)
-		{
-			lineNumber = line;
-			time = t; 
-			command = cmd;
-		}
-	}
-
 	// BEGIN AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=VARIABLE_DECLARATIONS
 
 	// END AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=VARIABLE_DECLARATIONS
@@ -253,32 +73,39 @@ public class DriveUsingFile extends Command {
 
 
 		// END AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=REQUIRES
-		posLeft = new DrivePosition(this, "Left");
-		posRight = new DrivePosition(this, "Right");
-		moveList = new ArrayList<MoveSegment>();
+		posLeft = new MotorPosition(leftName);
+		posRight = new MotorPosition(rightName);
+		moveList = new ArrayList<AutoSegment>();
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		System.out.println("MoveUsingFile(): INFO: Loading points from file [" + this.sp_FileName + "]");
+		String filePath = moveFilePath + "/" + moveFileName + "_" + Robot.gameData + ".csv" ;
+		System.out.println("MoveUsingFile(): INFO: Loading points from file [" + filePath + "]");
+		System.out.println("Working Directory1 = " + System.getProperty("user.dir"));
 
 		try{
-			moveList = new ArrayList<MoveSegment>();
-			String str;
-			Integer line = 0;
-			BufferedReader in = new BufferedReader(new FileReader(this.sp_FilePath+"/"+this.sp_FileName));
+			posLeft = new MotorPosition(leftName);
+			posRight = new MotorPosition(rightName);
+			moveList = new ArrayList<AutoSegment>();
+			moveList.add(new AutoSegment(-1, 0.0, AutoCmd.ResetPos, "Initialize", posLeft, posRight));
 			
-			while ((str = in.readLine()) != null) {
-				line ++;
-				str = str.trim();
-				if(str.length() == 0 || str.charAt(0) == '#')
+			double moveResetTime = 0;
+			String fileLine;
+			Integer lineNumer = 0;
+			BufferedReader in = new BufferedReader(new FileReader(filePath));
+			
+			while ((fileLine = in.readLine()) != null) {
+				lineNumer++;
+				fileLine = fileLine.trim();
+				if(fileLine.length() == 0 || fileLine.charAt(0) == '#')
 					continue;
 				
-				String[] fields = str.split(csvSplitBy);
+				String[] fields = fileLine.split(csvSplitBy);
 
 				if (fields.length < 2){
-					System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
+					System.out.println("DriveUsingFile: ****ERROR Line " + lineNumer.toString() + " is not a comment (#) but does not have a pipe ("+csvSplitBy+") delimiter!");
 					failed=true;
 				}
 				
@@ -287,7 +114,7 @@ public class DriveUsingFile extends Command {
 				String cmdName = fields[1].trim(); 
 				AutoCmd cmd = AutoCmd.NotFound;
 				for(AutoCmd cmdFind : AutoCmd.values())	{
-					if (cmdFind.name().equals(cmdName)) {
+					if (Objects.equals(cmdName,cmdFind.name())) {
 						cmd = cmdFind;
 						break;
 					}
@@ -295,7 +122,7 @@ public class DriveUsingFile extends Command {
 				
 				if(cmd==AutoCmd.NotFound)
 				{
-					System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " command '" + fields[1] + "' not found");
+					System.out.println("DriveUsingFile: ****ERROR Line " + lineNumer.toString() + " command '" + fields[1] + "' not found");
 					failed=true;					
 				}
 				
@@ -305,17 +132,31 @@ public class DriveUsingFile extends Command {
 				case Left:
 				case Right:
 					if (fields.length < 5) {
-						System.out.println("DriveUsingFile: ****ERROR Line " + line.toString() + " Left/Right is missing accel,targetVel,targetPos fields!");
+						System.out.println("DriveUsingFile: ****ERROR Line " + lineNumer.toString() + " Left/Right is missing accel,targetVel,targetPos fields!");
 						failed=true;
 					}
 					double a = Double.parseDouble(fields[2].trim());
 					double v = Double.parseDouble(fields[3].trim());
 					double d = Double.parseDouble(fields[4].trim());
-					moveList.add(new MoveSegment(line, time, cmd, a, v, d));
+					if (cmd == AutoCmd.Left) {
+						posLeft.addTarget(time-moveResetTime, a, v, d);
+					}
+					else {
+						posRight.addTarget(time-moveResetTime, a, v, d);
+					}
+					
+					moveList.add(new AutoSegment(lineNumer, time, cmd, fileLine));
 					break;
 					
+				case ResetPos:
+					moveResetTime = time;
+					posLeft = new MotorPosition(leftName);
+					posRight = new MotorPosition(rightName);
+					moveList.add(new AutoSegment(lineNumer, time, cmd, fileLine, posLeft, posRight));
+					break;
+										
 				default:
-					moveList.add(new MoveSegment(line, time, cmd));
+					moveList.add(new AutoSegment(lineNumer, time, cmd, fileLine));
 					break;
 				}
 
@@ -323,27 +164,34 @@ public class DriveUsingFile extends Command {
 			in.close();
 			
 		} catch (IOException e) {
-			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.sp_FileName + 
+			System.out.println("DriveUsingFile(): ****ERROR: Failed to load the file " + this.moveFileName  + 
 					"   Exception:" + e + "  Reason:" + e.getMessage() );
 			failed = true;
 		}
 
 
-		setStartDistance();
 		executeCount = 0;
 		moveListIndex = 0;
-		elapsedTime = new Timer();
-		elapsedTime.start();
+		startNanoTime = System.nanoTime() - 1;
+		//** elapsedTime = new Timer();
+		//** elapsedTime.start();
 		
-		processCommands();
+		processCommands(0.0);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
 		executeCount++;
-		processCommands();
-		updateDriveTrain();
+		
+		Double tickNow = executeCount * secondsPerExecute;
+		//** Double timerNow = elapsedTime.get();
+		Double timerNow = (double)(System.nanoTime() - startNanoTime) / 1e9;
+		
+		processCommands(timerNow);
+		updateDriveTrain(timerNow);
+		
+		System.out.printf("%5.2f (%.2f) %s %s\n", timerNow, tickNow, posLeft.toString(), posRight.toString());
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -372,60 +220,58 @@ public class DriveUsingFile extends Command {
 		Robot.cubePickup.autoEnd();
 		Robot.driveTrainSRX.driveStop();
 	}
-	
-	private void setStartDistance()
+
+	private void updateDriveTrain(double time)
 	{
-		posLeft.setOffsetDistance(Robot.driveTrainSRX.getLeftDistance());
-		posRight.setOffsetDistance(Robot.driveTrainSRX.getRightDistance());
-	}
-	
-	private void updateDriveTrain()
-	{
-		Robot.driveTrainSRX.pingDifferentialDrive();
+		double moveTime = time - moveStartTime;
 		
-		double leftDistance = posLeft.updatePosition();
-		double rightDistance = posRight.updatePosition();
+		double leftDistance = posLeft.updatePosition(moveTime);
+		double rightDistance = posRight.updatePosition(moveTime);
 		if (!failed)
 		{
-			if (Robot.gameData == 'R') {
-				Robot.driveTrainSRX.goToDistance(rightDistance, leftDistance);
-			}
-			else {
-				Robot.driveTrainSRX.goToDistance(leftDistance, rightDistance);
-			}
+			Robot.driveTrainSRX.goToDistance(rightDistance, leftDistance);
+			Robot.driveTrainSRX.goToDistance(leftDistance, rightDistance);
 		}
+		Robot.driveTrainSRX.pingDifferentialDrive();
+	}
+	
+	private void executeResetPos(AutoSegment autoSeg, double timeNow)
+	{
+		moveStartTime = timeNow;
+		posLeft = autoSeg.posLeft;
+		posRight = autoSeg.posRight;
+	
+		//-- posLeft.start(100);
+		//-- posRight.start(100);
+		posLeft.start(Robot.driveTrainSRX.getLeftDistance());
+		posRight.start(Robot.driveTrainSRX.getRightDistance());
 	}
 
-	private void processCommands() {
-		Double tickNow = executeCount * SecondsPerExecute;
-		Double timerNow = elapsedTime.get();
-		System.out.println("processCommands: tick time=" + tickNow.toString() + " timer= " + timerNow.toString());
+	private void processCommands(double timeNow) {
 		
 		while(moveListIndex < moveList.size()) {
-			MoveSegment moveSeg = moveList.get(moveListIndex);
-			if (moveSeg.time > tickNow) {
+			AutoSegment autoSeg = moveList.get(moveListIndex);
+			if (autoSeg.time > timeNow) {
 				break;
 			}
 			moveListIndex++;
+			System.out.printf(">> %.2f %2d: %s\n", timeNow, autoSeg.lineNumber, autoSeg.fileLine);
 			
-			System.out.println("processCommands: Executing Line " + moveSeg.lineNumber + ": " + moveSeg.command.name());
 			// NotFound, Left, Right, ResetPos, Close, Open, PullIn, Eject, StopIntake, ArmFloor, ArmHigh
-			switch(moveSeg.command)
+			switch(autoSeg.command)
 			{
 			default:
-				System.out.println("processCommands: " + moveSeg.command.name() + " not handled");
+				System.out.println("processCommands: " + autoSeg.command.name() + " not handled");
 				break;
 				
 			case Left:
-				posLeft.setTarget(moveSeg.targetAccel, moveSeg.targetVelocity, moveSeg.targetDistance);
 				break;
 				
 			case Right:
-				posRight.setTarget(moveSeg.targetAccel, moveSeg.targetVelocity, moveSeg.targetDistance);
 				break;	
 				
 			case ResetPos:
-				setStartDistance();
+				executeResetPos(autoSeg, timeNow);
 				break;
 				
 			case Close:
@@ -463,5 +309,267 @@ public class DriveUsingFile extends Command {
 			
 		}
 		finished = moveListIndex >= moveList.size();
+	}
+
+
+	// helper class to contain the parsed command file information
+	public class AutoSegment {
+		public int lineNumber;
+		public String fileLine;
+		public double time;
+		public AutoCmd command;
+		public MotorPosition posLeft; 
+		public MotorPosition posRight; 
+		
+		public AutoSegment(int lineCount, double t, AutoCmd cmd, String lineData, MotorPosition left, MotorPosition right)
+		{
+			lineNumber = lineCount;
+			fileLine = lineData;
+			time = t; 
+			command = cmd;
+			posLeft = left;
+			posRight = right;
+		}
+		
+		public AutoSegment(int lineCount, double t, AutoCmd cmd, String lineData)
+		{
+			lineNumber = lineCount;
+			fileLine = lineData;
+			time = t; 
+			command = cmd;
+		}
+	}
+
+	// Move profiles for a single motor
+	public class MotorPosition
+	{
+		//private final double minMoveTime = 0.001;
+		private String name;
+		private ArrayList<MoveSegment> moveSegmentList;
+		private MovePoint ptLast;
+		private double offsetPos;
+		private int moveSegmentIndex;
+		
+		public MotorPosition(String motorName)
+		{
+			name = motorName;
+			moveSegmentList = new ArrayList<MoveSegment>();
+			ptLast = new MovePoint(0,0,0);
+			start(0);
+		}
+
+		public double getDistance()
+		{
+			return offsetPos + ptLast.pos;
+		}
+		
+		public double updatePosition(double moveTime) {
+			MoveSegment moveSeq = null;
+			
+			// advance segment if needed
+			while(moveSegmentIndex < moveSegmentList.size()) {
+				moveSeq = moveSegmentList.get(moveSegmentIndex);
+				if (moveSeq.ptEnd.time > moveTime) {
+					break;
+				}
+				moveSegmentIndex++;
+			}
+			
+			// calculate location within segment
+			if (moveSeq != null) {
+				MovePoint pt = moveSeq.getPoint(moveTime);
+				ptLast.set(pt);				
+			}
+			
+			return getDistance();
+		}
+		
+		public String toString()
+		{
+			double accel = 0;
+			if (moveSegmentIndex < moveSegmentList.size()) {
+				accel = moveSegmentList.get(moveSegmentIndex).accel;
+			}
+			return String.format("    %s:%2d %5.1f %5.1f %7.1f %7.1f", name, moveSegmentIndex, accel, ptLast.vel, ptLast.pos, getDistance());
+		}
+		
+		public void start(double offset) {
+			offsetPos = offset;
+			moveSegmentIndex = 0;
+			if (moveSegmentList.size()==0) {
+				moveSegmentList.add(new MoveSegment());
+			}
+			MoveSegment ms = moveSegmentList.get(moveSegmentIndex);
+			ptLast.set(ms.ptStart);
+		}
+		
+		public void addTarget(double startTime, double maxAccel, double maxVel, double targetPos)
+		{
+			// initialize start/end points with default values
+			MovePoint ptTargetStart = new MovePoint(startTime, 0, 0);
+			
+			// look for a move containing the start time
+			int startIndex = 0;
+			for (startIndex=0; startIndex < moveSegmentList.size(); startIndex++) {
+				if (moveSegmentList.get(startIndex).ptEnd.time > startTime) {
+					break;
+				}
+			}
+			
+			if (startIndex < moveSegmentList.size()) {
+				// new target is changing the plan
+				// update the old segment to end at the new start time
+				MoveSegment msOld = moveSegmentList.get(startIndex);
+				
+				// get the velocity and position for the given time
+				ptTargetStart.set(msOld.getPoint(startTime));
+				
+				// set the existing segment to end at the new start point
+				msOld.ptEnd.set(ptTargetStart);
+				
+				// remove the remaining segments, usually the coast/brake from a previous target
+				startIndex++;
+				for(int trimIndex = moveSegmentList.size() - 1; trimIndex >= startIndex; trimIndex--) {
+					moveSegmentList.remove(trimIndex);
+				}
+			}
+			
+			// calc the move parameters
+			double deltaPos = targetPos - ptTargetStart.pos;
+			double moveLen = Math.abs(deltaPos);
+			double dir = deltaPos > 0 ? 1 : -1;
+			double deltaVel = dir * maxVel - ptTargetStart.vel;
+			
+			double accelTime = Math.abs(deltaVel / maxAccel);
+			double accelLen = 0.5 * maxAccel * accelTime * accelTime;
+			
+			double brakeTime = Math.abs(maxVel / maxAccel);
+			double brakeLen = 0.5 * maxAccel * brakeTime * brakeTime;
+			
+			double coastLen = moveLen - accelLen - brakeLen;
+			double coastTime = coastLen / maxVel;
+
+			if (0 == deltaPos)
+			{
+				// zero length move
+				return;
+			}
+			
+			if (coastLen > 0) {
+				// long move: accel, coast speed, brake.
+				MoveSegment msAccel = new MoveSegment();
+				msAccel.accel = deltaVel > 0 ? maxAccel : -maxAccel;
+				msAccel.ptStart.set(ptTargetStart);
+				msAccel.ptEnd.time = msAccel.ptStart.time + accelTime;
+				msAccel.ptEnd.vel = dir * maxVel;
+				msAccel.ptEnd.pos = msAccel.ptStart.pos + dir * accelLen;
+				moveSegmentList.add(msAccel);
+				
+				MoveSegment msCoast = new MoveSegment();
+				msCoast.accel = 0;
+				msCoast.ptStart.set(msAccel.ptEnd);
+				msCoast.ptEnd.time = msCoast.ptStart.time + coastTime;
+				msCoast.ptEnd.vel = dir * maxVel;
+				msCoast.ptEnd.pos = msCoast.ptStart.pos + dir * coastLen;
+				moveSegmentList.add(msCoast);				
+				
+				MoveSegment msBrake = new MoveSegment();
+				msBrake.accel = dir * -maxAccel;
+				msBrake.ptStart.set(msCoast.ptEnd);
+				msBrake.ptEnd.time = msBrake.ptStart.time + brakeTime;
+				msBrake.ptEnd.vel = 0;
+				msBrake.ptEnd.pos = targetPos;
+				moveSegmentList.add(msBrake);
+				
+				return;
+			}
+			
+			if (ptTargetStart.vel == 0) {
+				// short move from stop, equal accel/brake time & distance
+				accelTime = Math.sqrt(2 * moveLen / maxAccel);
+				accelLen = moveLen / 2;
+				
+				MoveSegment msAccel = new MoveSegment();
+				msAccel.accel = dir * maxAccel;
+				msAccel.ptStart.set(ptTargetStart);
+				msAccel.ptEnd.time = msAccel.ptStart.time + accelTime;
+				msAccel.ptEnd.vel = msAccel.ptStart.vel + dir * maxAccel * accelTime;
+				msAccel.ptEnd.pos = msAccel.ptStart.pos + dir * accelLen;
+				moveSegmentList.add(msAccel);	
+				
+				MoveSegment msBrake = new MoveSegment();
+				msBrake.accel = dir * -maxAccel;
+				msBrake.ptStart.set(msAccel.ptEnd);
+				msBrake.ptEnd.time = msBrake.ptStart.time + accelTime;
+				msBrake.ptEnd.vel = 0;
+				msBrake.ptEnd.pos = targetPos;
+				moveSegmentList.add(msBrake);
+				
+				return;				
+			}
+			
+			
+			// short or unknown movement, just 'jump' there
+			MoveSegment msJump = new MoveSegment();
+			msJump.accel = 0;
+			msJump.ptStart.set(ptTargetStart);
+			msJump.ptStart.pos = targetPos;
+			msJump.ptEnd.time = ptTargetStart.time;
+			msJump.ptEnd.vel = ptTargetStart.vel;
+			msJump.ptEnd.pos = targetPos;
+			moveSegmentList.add(msJump);
+			return;
+		}
+	}
+
+	// Movement between two states
+	public class MoveSegment {
+		public double accel;
+		public MovePoint ptStart;
+		public MovePoint ptEnd;
+		public MovePoint ptLast;
+		
+		public MoveSegment() {
+			ptStart = new MovePoint(0,0,0);
+			ptEnd = new MovePoint(0,0,0);
+			ptLast = new MovePoint(0,0,0);
+		}
+		
+		public MovePoint getPoint(double time)
+		{
+			if (time <= ptStart.time) {
+				ptLast.set(ptStart);
+			}
+			else if (time >= ptEnd.time) {
+				ptLast.set(ptEnd);
+			}
+			else {
+				double dt = time - ptStart.time;
+				ptLast.time = time;
+				ptLast.vel = ptStart.vel + accel * dt;
+				ptLast.pos = ptStart.pos + ptStart.vel * dt + 0.5 * accel * dt * dt;
+			}
+			return ptLast;
+		}
+	}
+		
+	// Movement state at given time
+	public class MovePoint {
+		public double time;
+		public double vel;
+		public double pos;
+		
+		public MovePoint(double t, double v, double p) {
+			time = t;
+			vel = v;
+			pos = p;
+		}
+		
+		public void set(MovePoint pt)
+		{
+			time = pt.time;
+			vel = pt.vel;
+			pos = pt.pos;
+		}
 	}
 }
