@@ -95,6 +95,8 @@ public class OI {
 
 
         // SmartDashboard Buttons
+        SmartDashboard.putData("ArcadeDrive: Stop", new ArcadeDrive(0, 0, 0));
+        SmartDashboard.putData("ArcadeDrive: Turn90", new ArcadeDrive(0, 90, 0));
         SmartDashboard.putData("TestArcDrive: test 36 15", new TestArcDrive(0, 12836));
         SmartDashboard.putData("TurnLeftOrRight: false", new TurnLeftOrRight(false));
         SmartDashboard.putData("DriveUsingFile", new DriveUsingFile());

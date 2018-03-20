@@ -73,11 +73,11 @@ public class TurnLeftOrRight extends Command {
     	}
     	steer *= -Robot.gyro.gyroP;
     	
-    	if (steer > Robot.gyro.TURN_MAX) {
-    		steer = Robot.gyro.TURN_MAX;
+    	if (steer > Robot.gyro.gyroTurnMax) {
+    		steer = Robot.gyro.gyroTurnMax;
     	}
-    	else if (steer < -Robot.gyro.TURN_MAX) {
-    		steer = -Robot.gyro.TURN_MAX;
+    	else if (steer < -Robot.gyro.gyroTurnMax) {
+    		steer = -Robot.gyro.gyroTurnMax;
     	}
         Robot.driveTrainSRX.arcadeDrive(0, steer);
     }
