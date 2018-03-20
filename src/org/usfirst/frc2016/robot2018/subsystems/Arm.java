@@ -199,6 +199,14 @@ public class Arm extends Subsystem {
 			if (Math.abs(presetPositions[position] - desiredPosition) > AbsoluteTolerance ) {
 				didWeMove=true;
 			}
+			if (position == MEDIUM) {
+				armTalon.configMotionCruiseVelocity(armCruiseVelocity*3, 0);
+				armTalon.configMotionAcceleration(200, 0);				
+			}
+			else {
+				armTalon.configMotionCruiseVelocity(armCruiseVelocity, 0);
+				armTalon.configMotionAcceleration(200, 0);
+			}
 			goTo(presetPositions[position]);
 			lastPreset=position;
 		}
