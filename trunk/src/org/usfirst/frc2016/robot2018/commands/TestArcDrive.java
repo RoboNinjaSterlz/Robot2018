@@ -42,7 +42,12 @@ public class TestArcDrive extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-    	Robot.driveTrainSRX.goToUsingMM(m_leftDistance, m_rightDistance);
+    	if (Robot.gameData == 'L') {
+    		Robot.driveTrainSRX.goToUsingMM(m_leftDistance, m_rightDistance);
+    	}
+    	else {
+    		Robot.driveTrainSRX.goToUsingMM(m_rightDistance, m_leftDistance);
+    	}
     }
 
     // Called repeatedly when this Command is scheduled to run

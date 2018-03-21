@@ -573,7 +573,7 @@ public class DriveTrainSRX extends Subsystem {
 		talonDriveRight1.configMotionCruiseVelocity(rightCruiseVelocity, 0);
 		
 		talonDriveLeft1.configMotionAcceleration(leftAccel, 0);
-		talonDriveLeft1.configMotionAcceleration(rightAccel, 0);
+		talonDriveRight1.configMotionAcceleration(rightAccel, 0);
 		
 		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
 		talonDriveRight1.set(ControlMode.MotionMagic, finalRight);
@@ -651,6 +651,7 @@ public class DriveTrainSRX extends Subsystem {
 		//SmartDashboard.putBoolean("Left Good", leftGood);
 		SmartDashboard.putNumber("Left Error", finalLeft - leftEncoder);
 		SmartDashboard.putNumber("Right Error", finalRight - rightEncoder);
+		SmartDashboard.putBoolean("Drive Stuck", stuck);
 		return stuck || (leftGood && rightGood);
 	}
 	/*
