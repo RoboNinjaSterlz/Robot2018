@@ -91,6 +91,10 @@ public class DriveTrainSRX extends Subsystem {
 	private String lastDriveMode;
 	private double lastRightCount, lastLeftCount, stuckCount, stuckStartCount;
 	private double accumSpeed =0;
+	
+	private double lastEndDistanceLeft = 0;
+	private double lastEndDistanceRight = 0;
+	
 	StringBuilder _sb = new StringBuilder();
 	int _loops = 0;
 
@@ -580,6 +584,63 @@ public class DriveTrainSRX extends Subsystem {
 		stuckCount = 0;
 	}
 	
+	public void goToUsingMM(double leftDistance, double rightDistance, boolean newStart, int accel, int vel) {
+		if (newStart) {
+			// start move from current location
+			lastEndDistanceLeft = getLeftDistance();
+			lastEndDistanceRight = getRightDistance();
+		}
+		
+		// update the last distance to include this move
+		lastEndDistanceLeft += leftDistance;
+		lastEndDistanceRight += rightDistance;
+		
+		// update the final count target for this move
+		finalLeft = (int)Math.round(lastEndDistanceLeft * COUNTS_PER_INCH);
+		finalRight = (int)Math.round(lastEndDistanceRight * COUNTS_PER_INCH);
+		
+		// get absolute magnitude of the move
+		leftDistance = Math.abs(leftDistance);
+		rightDistance = Math.abs(rightDistance);
+		
+		// check for default accel/vel
+		if (accel <= 0) accel = acceleration;
+		if (vel <= 0) vel = cruiseVelocity;
+		
+		// scale the accel/vel to match the magnitude of the moves
+		int leftCruiseVelocity = vel;
+		int rightCruiseVelocity = vel;
+		int leftAccel = accel;
+		int rightAccel = accel;
+		double distanceRatio;
+
+		if (leftDistance < rightDistance)
+		{
+			distanceRatio = (double)leftDistance / (double)rightDistance;
+			leftCruiseVelocity = (int)Math.round(vel * distanceRatio);
+			leftAccel = (int)Math.round(accel * distanceRatio );
+		}
+		else if (rightDistance < leftDistance)
+		{
+			distanceRatio = (double)rightDistance / (double)leftDistance;
+			rightCruiseVelocity = (int)Math.round(vel * distanceRatio);
+			rightAccel = (int)Math.round(accel * distanceRatio );
+		}
+
+		// Reset the speed in case someone else changed it.
+		//SmartDashboard.putNumber("FinalRight", finalRight);
+		//SmartDashboard.putNumber("Distance in Counts", distanceAsCountsRight);
+		talonDriveLeft1.configMotionCruiseVelocity(leftCruiseVelocity, 0);
+		talonDriveRight1.configMotionCruiseVelocity(rightCruiseVelocity, 0);
+		
+		talonDriveLeft1.configMotionAcceleration(leftAccel, 0);
+		talonDriveRight1.configMotionAcceleration(rightAccel, 0);
+		
+		talonDriveLeft1.set(ControlMode.MotionMagic, finalLeft);
+		talonDriveRight1.set(ControlMode.MotionMagic, finalRight);
+		stuckCount = 0;
+	}
+	
 	public void goTo(double leftDistance, double rightDistance) {
 		int distanceAsCountsLeft;
 		int distanceAsCountsRight;
@@ -624,11 +685,15 @@ public class DriveTrainSRX extends Subsystem {
 	 * Method to go with the above move used to determine
 	 * when the move has completed
 	 */
-	public boolean moveComplete() {
+	public boolean moveComplete(int maxPositionError) {
+		if (maxPositionError <= 0) {
+			maxPositionError = MAX_POSITION_ERROR;
+		}
+		
 		int leftEncoder =  getLeftEncoder();
 		int rightEncoder = getRightEncoder();
-		boolean leftGood = Math.abs(finalLeft - leftEncoder) < MAX_POSITION_ERROR;
-		boolean rightGood = Math.abs(finalRight - rightEncoder) < MAX_POSITION_ERROR;
+		boolean leftGood = Math.abs(finalLeft - leftEncoder) < maxPositionError;
+		boolean rightGood = Math.abs(finalRight - rightEncoder) < maxPositionError;
 		
 	    boolean stuck = false;
 		if (stuckStartCount < STUCK_START_IGNORE) {
@@ -654,6 +719,12 @@ public class DriveTrainSRX extends Subsystem {
 		SmartDashboard.putBoolean("Drive Stuck", stuck);
 		return stuck || (leftGood && rightGood);
 	}
+	
+	public boolean moveComplete() {
+		return moveComplete(0);
+	}
+	
+	
 	/*
 	 * Returns the average encoder rate of left and right 
 	 */
