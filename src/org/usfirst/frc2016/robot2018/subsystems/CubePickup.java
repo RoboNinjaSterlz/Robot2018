@@ -280,8 +280,7 @@ public class CubePickup extends Subsystem {
 	public void acquireCube() {
 		acquireCubeActive = true;
 	}
-	
-	
+
 	public void autoEnd() {
 		acquireCubeActive = false;
 		ejectCubeActive = false;
