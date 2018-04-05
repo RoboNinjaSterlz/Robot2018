@@ -33,6 +33,8 @@ public class CurrentMonitor extends Subsystem {
 	private final int FAILTHRESHOLD = 100;
 	private final double THROTTLETHRESHOLD = .2;
 	private final double CURRENT_THRESHOLD = .2;
+	private boolean monitorEnabled = false;
+	private boolean readEnabled = true;
 	
 	public CurrentStatus[] currentStatus = CurrentStatus.currentStatusSet(numPdPorts);
 
@@ -54,6 +56,9 @@ public class CurrentMonitor extends Subsystem {
 
         // Set the default command for a subsystem here.
         // setDefaultCommand(new MySpecialCommand());
+   		if (monitorEnabled)	{
+   			Robot.telem.addColumn("MonitorMs");
+   		}
     }
 	// Put methods for controlling this subsystem
     // here. Call these from Commands.
@@ -61,38 +66,50 @@ public class CurrentMonitor extends Subsystem {
 
     @Override
     public void periodic() {
-    	// Put code here to be run every loop
-    	for (int i=0; i<numPdPorts; i++) {
-    		if (currentStatus[i].name != "" ) {
-    			currentStatus[i].amps = currentStatus[i].talon.getOutputCurrent();
-    			currentStatus[i].throttle = currentStatus[i].talon.getMotorOutputVoltage();
-    			if (Math.abs(currentStatus[i].throttle) > THROTTLETHRESHOLD ) {
-    				if (currentStatus[i].amps < CURRENT_THRESHOLD && !currentStatus[i].fail) {
-    					currentStatus[i].failCount++;
-    					if (currentStatus[i].failCount >= FAILTHRESHOLD) {
-    						currentStatus[i].fail = true;
-    					}
-    				}
-    				else if (!currentStatus[i].fail) {
-    					currentStatus[i].failCount=0;
-    				}
-    			}
-    			Robot.telem.saveBoolean(currentStatus[i].name+" Fail", currentStatus[i].fail);
-    			Robot.telem.saveDouble(currentStatus[i].name+" Voltage",currentStatus[i].throttle);
-    			Robot.telem.saveDouble(currentStatus[i].name+" Current", currentStatus[i].amps);
-    			//SmartDashboard.putNumber(currentStatus[i].name+"Fail", currentStatus[i].failCount);    			
-    			SmartDashboard.putNumber(currentStatus[i].name+"Currrent", currentStatus[i].amps);
-    		}
-    	}
-    }
+   		if (monitorEnabled)	{
+ 	    	// Put code here to be run every loop
+   	   		long t1  = System.nanoTime();
+	    	for (int i=0; i<numPdPorts; i++) {
+	    		if (currentStatus[i].name != "" ) {
+	    			currentStatus[i].amps = 0;
+	    			currentStatus[i].throttle = 0;
+	    			if (readEnabled) {
+	    				currentStatus[i].amps = currentStatus[i].talon.getOutputCurrent();
+	    				currentStatus[i].throttle = currentStatus[i].talon.getMotorOutputVoltage();
+	    			}
+	    			if (Math.abs(currentStatus[i].throttle) > THROTTLETHRESHOLD ) {
+	    				if (currentStatus[i].amps < CURRENT_THRESHOLD && !currentStatus[i].fail) {
+	    					currentStatus[i].failCount++;
+	    					if (currentStatus[i].failCount >= FAILTHRESHOLD) {
+	    						currentStatus[i].fail = true;
+	    					}
+	    				}
+	    				else if (!currentStatus[i].fail) {
+	    					currentStatus[i].failCount=0;
+	    				}
+	    			}
+	    			Robot.telem.saveBoolean(currentStatus[i].name+" Fail", currentStatus[i].fail);
+	    			Robot.telem.saveDouble(currentStatus[i].name+" Voltage",currentStatus[i].throttle);
+	    			Robot.telem.saveDouble(currentStatus[i].name+" Current", currentStatus[i].amps);
+	    			//SmartDashboard.putNumber(currentStatus[i].name+"Fail", currentStatus[i].failCount);    			
+	    			//--SmartDashboard.putNumber(currentStatus[i].name+"Currrent", currentStatus[i].amps);
+	    		}
+	    	}
+	    	
+	    	double dtMs = (System.nanoTime() - t1)/1e6;
+	    	Robot.telem.saveDouble("MonitorMs", dtMs);
+   		}
+   }
     		
     public void registerMonitorDevive(WPI_TalonSRX device , String dev_name)  {
     	int id = device.getDeviceID();
     	currentStatus[id].talon=device;
     	currentStatus[id].name = dev_name;
-    	Robot.telem.addColumn(dev_name+" Current");
-    	Robot.telem.addColumn(dev_name+" Voltage");
-    	Robot.telem.addColumn(dev_name+" Fail");
+    	if (monitorEnabled) {
+	    	Robot.telem.addColumn(dev_name+" Current");
+	    	Robot.telem.addColumn(dev_name+" Voltage");
+	    	Robot.telem.addColumn(dev_name+" Fail");
+    	}
     }
  }
 

@@ -56,7 +56,7 @@ public class TurnLeftOrRight extends Command {
     	if (!m_matchGameData) {
     		turnDirection *= -1;
     	}
-    SmartDashboard.putNumber("Turnornot angle",turnDirection);
+    	//--SmartDashboard.putNumber("Turnornot angle",turnDirection);
     }
 
     // Called repeatedly when this Command is scheduled to run

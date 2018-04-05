@@ -51,7 +51,8 @@ public class CameraDrive extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	// Get steering error from PI
-    	targetCorrection = SmartDashboard.getNumber("GearAlignTargetCorrection", -255);
+    	//--targetCorrection = SmartDashboard.getNumber("GearAlignTargetCorrection", -255);
+    	targetCorrection = -255;
     	if (targetCorrection != -255) {
     		Robot.driveTrainSRX.arcadeDrive(DRIVESPEED, targetCorrection*ERROR_MULTIPLIER);
     	}
