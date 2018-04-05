@@ -42,60 +42,65 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 */
 public class LCTelemetry { 
 
-    private String[] listRows;								
-    private String[] listColumns;				/** Arrays of columnNames, think ladder. Each step is data. They are numbered starting at 0.
-     											* Order is maintained. This is how the column values can be added in any order and be
-     											* printed in the correct column. 
-     											*/
+    private String[] listRows;	// rows of saved data							
     
-    private Map<String, String> dictColumnData; /** This is a string key, value map. You put in the key and get the value. */ 
-    private int i_TotalRows;
-    private int i_listColumnsIndex; 
-    
-    private FileWriter fileHandle;
-    private Timer tim_Time;
+    private int savedRows;  // rows of data produced
+    private Timer timerStart;  // time from last rest
+    private double timeLast;   // time of last save
     private DriverStation driverStation;
-    private boolean bp_TimestampFile;
-    private String sp_FileName;			    /** Default: telemetry.<b>Note: xls is added to the end.</b> */
-    private String sp_FilePath;				/** Default: /tmp folder.(linked to /var/volitile/tmp) Lost after reboot, /home/lvuser is writable.*/
+    private boolean timeStampFilename;  // true to add date stamp to filename
+    private String filename;			    /** Default: telemetry.<b>Note: xls is added to the end.</b> */
+    private String filePath;				/** Default: /tmp folder.(linked to /var/volitile/tmp) Lost after reboot, /home/lvuser is writable.*/
 
-    public final int ki_MaxColumns 	= 300;				/** Number of columns. Increase if you need to. */ 
-    public final int ki_MaxRows 	= 50  * 60 * 3; 	/** Default 9000: 50 times per second * 60 seconds * 3 minutes */
+    public final int maxRows  = 50  * 60 * 3; 	/** Default 9000: 50 times per second * 60 seconds * 3 minutes */
 
-    private String s_TelemType = "new";
-    
     private DateFormat dateFormat;
-    private Calendar cal;
-
-
-	/** Class Contructor initialize you variables here. 
+    
+    // column headers for default data
+    private String defaultColumnNames = "Timer,Scan MS,Date Time,Event,Match Type,Match Number,Batt Volts,Brown Out,Mode";
+    
+    // dictionary for the column names
+    private Map<String, Integer> dictColumnNames;
+    // storage for building current row data
+    private String[] currentRowData;
+    
+    private final int scanHistSize = 100;  // total timing buckets
+    private int[] scanHist = new int[scanHistSize];
+    
+    
+	/** Class Constructor initialize you variables here. 
 	 * Here the size of the arrays can be adjusted to allow for more columns
 	 * and more rows. The constants ki_MaxRos and ki_MaxColumns control that.
     */
     public LCTelemetry() {
-    	tim_Time = new Timer();
-    	tim_Time.start();
+    	timerStart = new Timer();
+    	timerStart.start();
     	
-        i_listColumnsIndex = 0;								 
-
-        listColumns = new String[ki_MaxColumns];
-        dictColumnData = new HashMap<String, String>();
         driverStation = DriverStation.getInstance();
-        bp_TimestampFile =  true;
-        sp_FilePath = "/var/volatile/tmp";					/** /var/volatile/tmp folder. Lost after reboot, /home/lvuser is writable.*/
-        sp_FileName = "telemetry";
+        timeStampFilename =  true;
+        filePath = "/var/volatile/tmp";					/** /var/volatile/tmp folder. Lost after reboot, /home/lvuser is writable.*/
+        filename = "telemetry";
         dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        cal = Calendar.getInstance();
+        
+        // initialize dictionary with default columns
+        dictColumnNames = new HashMap<String, Integer>();
+        for(String columnName : defaultColumnNames.split(",")) {
+        	addColumn(columnName);
+        }
         
         createNewList();
  
     }
 
     private void createNewList(){
-        i_TotalRows = 0;
-        listRows = new String[ ki_MaxRows + 2 ];
-        s_TelemType = "new";
-
+        timerStart.reset();
+        timeLast = 0;
+        
+        savedRows = 0;
+        listRows = new String[maxRows];
+        
+        scanHist = new int[scanHistSize];
+        currentRowData = new String[dictColumnNames.size()];
     }
     
     /**
@@ -114,8 +119,8 @@ public class LCTelemetry {
     *   }
     * <pre>
     */
-    public void restartTimer() {							// they can restart our internal time ever time we switch modes. 
-        tim_Time.reset();
+    public void restartTimer() {
+         createNewList();
     }
 
     /**
@@ -143,12 +148,39 @@ public class LCTelemetry {
     * <p>
     * @param	columnName string at the top of this column.  
     */
-    public void addColumn(String columnName) {				// add a column to the list of columns
-        listColumns[i_listColumnsIndex++] = columnName;		// this is an array so we use an index i_listColumnsIndex++ to tell use where to put it 
-    }														// the ++ on the right tells Java to use the current value but then 
-    														// increment AFTER you use it. 
-    														// If it was ++i_listColumnsIndex it means increment and use value. 
-
+    public void addColumn(String columnName) {
+    	if(!dictColumnNames.containsKey(columnName)) {
+    		// System.out.println("LCTelemetry: adding column " + columnName);
+        	dictColumnNames.put(columnName, dictColumnNames.size());
+    	}
+    }
+    
+    /**
+    * Called to add a string to a column in the
+    * Telemetry instance. The columnName is the exact spelling   
+    * of the name entered in an addColumn call. The order this data 
+    * is added will not change the order of the columns. No additional
+    * formatting is done on the data. 
+    * <p>
+    * Example: See saveString()
+    * <p>
+    * If you have a double that you want to save to more precision
+    * convert to a sting and save as a string. As in saving an 
+    * accelerometer value you may want 6 decimal places. 
+    * <pre>
+    * telem.saveString("S ACCEL X", String.format("%.6f",this.d_BACC_XAxis) );
+    * </pre>
+    * <p>
+    * @param	columnName string at the top of this column.  
+    * @param	value String to be written.  
+    */
+    public void saveString(String columnName, String value){
+    	int colIndex = dictColumnNames.getOrDefault(columnName, -1);
+    	if (colIndex >= 0 && colIndex < currentRowData.length) {
+    		currentRowData[colIndex] = value;
+    	}
+    }
+    
     /**
     * Called to add an Integer to a column in the Telemetry instance.
     * The columnName is the exact spelling of the name entered in an  
@@ -173,7 +205,7 @@ public class LCTelemetry {
     * @param	value Integer number to be written.  
     */
     public void saveInteger(String columnName, int value){
-        dictColumnData.put(columnName,  String.format("%s",value) );		// format as an integer
+    	saveString(columnName,  String.format("%d", value) );
     }
 
     
@@ -193,32 +225,10 @@ public class LCTelemetry {
     * @param	value Double number to be written.  
     */
     public void saveDouble(String columnName, double value){
-        dictColumnData.put(columnName,   String.format("%.2f",value) );		// format as floating point with 2 decimals. 
+    	saveString(columnName,   String.format("%.2f",value) );		// format as floating point with 2 decimals. 
     }
 
-    
-    /**
-    * Called to add a string to a column in the
-    * Telemetry instance. The columnName is the exact spelling   
-    * of the name entered in an addColumn call. The order this data 
-    * is added will not change the order of the columns. No additional
-    * formatting is done on the data. 
-    * <p>
-    * Example: See saveString()
-    * <p>
-    * If you have a double that you want to save to more precision
-    * convert to a sting and save as a string. As in saving an 
-    * accelerometer value you may want 6 decimal places. 
-    * <pre>
-    * telem.saveString("S ACCEL X", String.format("%.6f",this.d_BACC_XAxis) );
-    * </pre>
-    * <p>
-    * @param	columnName string at the top of this column.  
-    * @param	value String to be written.  
-    */
-    public void saveString(String columnName, String value){
-        dictColumnData.put(columnName,value);								// no formatting needed
-    }
+
 
     /**
     * Called to add a true/false boolean to a column in the
@@ -233,7 +243,7 @@ public class LCTelemetry {
     * @param	value Boolean to be written.  
     */
     public void saveBoolean(String columnName, Boolean value){			 
-        dictColumnData.put(columnName, value.toString());					// save the Boolean as a string 
+    	saveString(columnName, value.toString());					// save the Boolean as a string 
     }
 
     
@@ -252,10 +262,7 @@ public class LCTelemetry {
     * @param	value boolean to be written.  
     */
     public void saveTrueBoolean(String columnName, Boolean value){		// we only want true or blank easier to read
-        if(value == true)
-            dictColumnData.put(columnName,"true");
-        else
-            dictColumnData.put(columnName,"");
+        saveString(columnName, (value==true) ? value.toString() : "");
     }
 
     
@@ -274,13 +281,21 @@ public class LCTelemetry {
     * @param	value boolean to be written.  
     */
     public void saveFalseBoolean(String columnName, Boolean value){		// we only want false or blank, easier to read. 
-        if(value == true)
-            dictColumnData.put(columnName,"");
-        else
-            dictColumnData.put(columnName,"false");
+        saveString(columnName, (value==true) ? "" : value.toString());
+    }
+    
+    
+    // save trace data into the log
+    public void saveTrace(String traceMsg)
+    {
+        if( this.savedRows >= this.maxRows )
+            return;
+        
+        double timeNow = timerStart.get();
+        double deltaMs = (timeNow - timeLast)*1000;
+        listRows[this.savedRows++] = String.format("%.3f,%.1f,%s", timeNow, deltaMs, traceMsg);
     }
 
-    
     /**
     * Called to tell telemetry to save the current saved
     * data into a row. This will cause the data to be saved under the
@@ -303,31 +318,35 @@ public class LCTelemetry {
     *     }
 	* </pre>
     */
-    public void writeRow(){										// save a row of data to memory
-
+    public void writeRow(){	
     	//if( true ) return;
     	
-        if( this.i_TotalRows >= this.ki_MaxRows )				// if we have already written MAXRows to memory then 
-            return;												// return without adding more rows. The calculation for 
-        														// total rows should be good for a match of 50 cycles per second * 180 seconds ( 3 minutes) = 9000
-        														// they should not save during disabled mode
+    	// don't save beyond maximum allocation
+        if( this.savedRows >= this.maxRows )
+            return;
 
-        String[] listColumnData = new String[ki_MaxColumns];	// temporary list of each of the column's data. Explained why later
-        														// this is cleaned up when the this function is over. 
+        // ordering of saves must match the default headers
+        int colIndex = 0;
         
-        int i_TotalColumns = 0;									// index for the column data being added to the temp list
+        // save the elapsed time
+        double timeNow = timerStart.get();
+        currentRowData[colIndex++] = String.format( "%.3f", timeNow );
         
+        // delta time from save writeRow, the periodic scan time
+        double scanMs = (timeNow - timeLast)*1000;
+        currentRowData[colIndex++] = String.format( "%.1f", scanMs );
         
-       
-        listColumnData[i_TotalColumns++] =						// Save the Telemetry generated columns first in the proper order, notice increment  
-        			String.format( "%.2f", tim_Time.get() );
+        // update scan time histogram
+        int histIndex = (int) Math.min(scanHistSize-1, Math.round(scanMs));
+        scanHist[histIndex]++;
         
-        listColumnData[i_TotalColumns++] =
-        			dateFormat.format(cal.getTime());						
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+        timeLast = timeNow;
         
-        listColumnData[i_TotalColumns++] = 
-        			driverStation.getEventName();
+        // time stamp the row
+        currentRowData[colIndex++] = dateFormat.format(Calendar.getInstance().getTime());
+        
+        // event data
+        currentRowData[colIndex++] = driverStation.getEventName();
         
         DriverStation.MatchType matchType = driverStation.getMatchType();
         String s_matchType = "";
@@ -339,19 +358,17 @@ public class LCTelemetry {
         	s_matchType = "Practice";
         else if (matchType == DriverStation.MatchType.Qualification)
         	s_matchType = "Qualification";
-        listColumnData[i_TotalColumns++] = s_matchType; 
+        currentRowData[colIndex++] = s_matchType; 
 
-        listColumnData[i_TotalColumns++] = 
-    			Integer.toString(driverStation.getMatchNumber());
+        currentRowData[colIndex++] = Integer.toString(driverStation.getMatchNumber());
 
-        listColumnData[i_TotalColumns++] = 
-    			String.format( "%.2f", RobotController.getBatteryVoltage() );
+        currentRowData[colIndex++] = String.format( "%.2f", RobotController.getBatteryVoltage() );
 
         String s_Brownout = "";
         if (RobotController.isBrownedOut()) {
         	s_Brownout = "True";
         }
-        listColumnData[i_TotalColumns++] = s_Brownout;
+        currentRowData[colIndex++] = s_Brownout;
 
         String s_Mode = "";
         
@@ -359,43 +376,18 @@ public class LCTelemetry {
         else if (driverStation.isOperatorControl() == true) s_Mode = "teleop";		// we don't like to do it as it may not be clear and harder to debug.
         else if (driverStation.isDisabled() == true) 		s_Mode = "disable";		// added here for your viewing pleasure and a learning moment 
 
-        if( this.i_TotalRows == 0)								// first row
-        	this.s_TelemType = s_Mode;	    					// need a string to hold this Mode
-        	
-        listColumnData[i_TotalColumns++] = s_Mode;				// add mode to the column data list 
+        currentRowData[colIndex++] = s_Mode;				// add mode to the column data list 
         
-
-        for(String columnName : listColumns){					// go through all the headers looking for their data in the HashMap or dictionary 
-
-        	if( columnName == null )							// if we hit a header that had no value (null), end of the header list, break out of the loop  
-        			break; 
-        	
-        	String sValue = "";									// Create a tmp sting to hold the column data. "" assumes this column does not have any data 
-
-            if(dictColumnData.containsKey(columnName))			// use the columnName to see if there is any column data for this header
-                sValue = dictColumnData.get(columnName);		// yes their is, save it to sValue
-            	
-            if (sValue == null)									// this is an error get out
-            	break;
-            
-            listColumnData[i_TotalColumns++] = sValue;			// add the value to the list. The important point here is this is how the 
-            													// actual data is saved in the same position as the header
-            													// no matter when the column data was written to the class 
-            
+        // change nulls to empty
+        for(colIndex=0; colIndex < currentRowData.length; colIndex++) {
+        	if (null==currentRowData[colIndex]) 
+        		currentRowData[colIndex] = "";
         }
         
-        while( i_TotalColumns < listColumnData.length  )		// here we set all of the rest of the column data in this list to ""
-            listColumnData[i_TotalColumns++] = "";				// if we did not do this then the word null would show up for all the extra columns
-        														// this extra data is annoying but is the price we pay for speed. 
+        // convert array to string
+        listRows[this.savedRows++] = String.join(",", currentRowData);
         
-        listRows[this.i_TotalRows++] = String.join(",", listColumnData);	// save this row to the row list 
-        																	// This is why we use the array listColumnData. Using the join method to save to the 
-        																	// list of rows is very, very fast and does not use any robot cycles. 
-        																	// we still run at 50 cycles per second. Other methods we use in development
-        																	// made us run at 20 cycles per second.
-        
-        this.dictColumnData.clear();										// now clear out the old column data for the next pass. 
-            
+        currentRowData = new String[dictColumnNames.size()];
     }
 
     
@@ -416,10 +408,9 @@ public class LCTelemetry {
     */
     public void loadConfig(Config config){
     	
-        this.sp_FileName = config.getString("Tele_FileName", "telemetry");
-        this.sp_FilePath = config.getString("Tele_FilePath", "/tmp"); 
-        this.bp_TimestampFile = config.getBoolean("Tele_TimestampFile", true);
-        
+        this.filename = config.getString("Tele_FileName", "telemetry");
+        this.filePath = config.getString("Tele_FilePath", "/tmp"); 
+        this.timeStampFilename = config.getBoolean("Tele_TimestampFile", true);
     }
  
     
@@ -434,12 +425,12 @@ public class LCTelemetry {
     */
     public String getFileName(){										// build up the file name
 
-    	if(sp_FileName.length() == 0 )
-    		sp_FileName = "telemetry";
+    	if(filename.length() == 0 )
+    		filename = "telemetry";
     		
-    	String s_FullFileName = sp_FilePath + "/" + sp_FileName; // + "_" + this.s_TelemType;
+    	String s_FullFileName = filePath + "/" + filename; // + "_" + this.s_TelemType;
     	
-    	if(this.bp_TimestampFile==true)
+    	if(this.timeStampFilename==true)
     		s_FullFileName += "_" +  new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 
     	s_FullFileName += ".csv";										// .xls makes it look like an Excel spread spread
@@ -468,7 +459,7 @@ public class LCTelemetry {
     public void outputToDashBoard(Boolean b_MinDisplay){
 
     	if(driverStation.isDisabled()){									// only acted upon and displayed in disabled mode to save cycles 
-    		SmartDashboard.putString("Tele_FileName", getFileName() );
+    		//--SmartDashboard.putString("Tele_FileName", getFileName() );
     	}
     }
     
@@ -498,24 +489,44 @@ public class LCTelemetry {
     */
     public void saveSpreadSheet(){
     	
-    	if( this.i_TotalRows == 0)
+    	if( this.savedRows == 0)
     		return;
     	
     
         try {
-			fileHandle = new FileWriter( getFileName() );
-
-			String headerRow = "Timer,Date Time,Event,Match Type,Match Number,Batt Volts,Brown Out,Mode,";			// these are common fields LCTelemetry adds
+        	FileWriter fileHandle = new FileWriter( getFileName() );
 			
-            for (int i = 0; listColumns[i] != null; i++) {
-            	headerRow += listColumns[i] + ',';					// the , inserts a comma character easily read as a column in excel. 
+			// pull the header names out of the dictionary
+			String[] headerNames = new String[dictColumnNames.size()];
+			for (Map.Entry<String,Integer> entry : dictColumnNames.entrySet()) {
+				int index = entry.getValue();
+				if(index >= 0 && index < headerNames.length) {
+					headerNames[index] = entry.getKey();
+				}
+			}
+          
+            // write the header. the \n is a new line indicating the end of a line or row in the sheet. 
+        	fileHandle.write(String.join(",",  headerNames) + "\n");						
+			
+        	// write telemetry data
+            for (int i = 0; i < listRows.length && listRows[i] != null; i++) {
+            	fileHandle.write(listRows[i] + "\n");   
             }
             
-        	fileHandle.write(headerRow + "\n");						// write the header. the \n is a new line indicating the end of a line or row in the sheet. 
-			
-        	
-            for (int i = 0; listRows[i] != null; i++) {
-            	fileHandle.write(listRows[i] + "\n");				// write each row of telemetry data. Teh \n is a new line character.   
+        	// write scan time histogram
+            fileHandle.write("\nScan Timing Histogram\nMs,Count\n");
+            int count = 0;
+            int sum = 0;
+            for (int i = 0; i < scanHistSize; i++) {
+            	if (scanHist[i] > 0 )
+            	{
+            		count += scanHist[i];
+            		sum += i * scanHist[i];
+            		fileHandle.write(String.format("%d,%d\n", i, scanHist[i]));
+            	}
+            }
+            if (count>0) {
+            	fileHandle.write(String.format("Average Scan: %d\n", sum/count));
             }
             
             fileHandle.close();						

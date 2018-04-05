@@ -303,13 +303,13 @@ public class Arm extends Subsystem {
 	// mostly for debugging updates the smart dashboard with position info
 	public void periodic() {
 		if (madeFirstMove) {
-			SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
+			//---SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
 
 			SmartDashboard.putNumber("Arm Position", getPosition());
-			SmartDashboard.putNumber("Arm Position Error", getPositionError());
-			SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
+			//--SmartDashboard.putNumber("Arm Position Error", getPositionError());
+			//--SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
 //			SmartDashboard.putBoolean("Did Move",ArmMoved());
-			SmartDashboard.putNumber("Last Arm Position", lastPreset );
+			//--SmartDashboard.putNumber("Last Arm Position", lastPreset );
 		}
 		/*
 		 * The following is out for now. Add back if we need to tune the arm postion 

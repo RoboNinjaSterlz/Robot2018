@@ -114,8 +114,6 @@ public class DriveUsingFile extends CommandGroup {
 	@Override
 	protected void initialize() {
 		//--String mySwitch = "L";
-		GetGameData getGameData = new GetGameData();
-		getGameData.execute();
 		String mySwitch = Character.toString(Robot.gameData);
 		
 		String filePath = moveFilePath + "/" + moveFileName + "_" + mySwitch + ".csv" ;
@@ -530,7 +528,6 @@ public class DriveUsingFile extends CommandGroup {
 			case TANK_WIDTH:
 			case ACCEL:
 			case MOVE:
-			case JOG_MOVE:
 			case ARC:
 			case DELAY:
 				break;

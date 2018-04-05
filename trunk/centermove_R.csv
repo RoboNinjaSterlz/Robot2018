@@ -1,27 +1,22 @@
-# CenterMoves.csv
-# 
-# Commands: Left, Right, ResetPos, Close, Open, PullIn, Eject, StopIntake, ArmFloor, ArmHigh, Stop
-# Columns:
-# Time(sec), Command, Accel, TargetVel, TargetPos
-00.00, ResetPos
-00.00, ArmHigh
-00.00, Left,  20.0, 20, -108
-00.00, Right, 20.0, 20, -108
-01.50, Left,  20.0, 15, -108
-02.50, Left,  20.0, 20, -108
-03.00, Right, 20.0, 15, -108
-03.50, Right, 20.0, 20, -108
-#8.50, Eject
-#9.00, ResetPos
-#9.00, Left,  5.0, 5,  25
-#9.00, Right, 10.0, 10, 50
-#9.50, StopIntake
+/ CenterMoves.csv
+/ 
+// set move parameters
+ZeroPos()
+Accel(300)
+CoastVel(75)
+TankWidth(26)
 
-#10.00, ArmFloor
-#14.00, Open
-#14.50, PullIn
-#14.00, Close
-#14.50, StopIntake
-#14.00, ArmHigh
-#15.00, Eject
-15.00, Stop
+// move to switch
+Move( -10, False )
+Arc( -40, -80, False )
+Move( -6, False )
+Arc( -80, -40, False )
+Move( -10, True)
+CubeOut( -.2 )
+CubeStop( .5 )
+
+CoastVel(10)
+
+Move( 6, False )
+Arc( 80, 40, False )
+Move( 10, True )

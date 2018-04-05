@@ -1,27 +1,55 @@
-# CenterMoves.csv
-# 
-# Commands: Left, Right, ResetPos, Close, Open, PullIn, Eject, StopIntake, ArmFloor, ArmHigh, Stop
-# Columns:
-# Time(sec), Command, Accel, TargetVel, TargetPos
-00.00, ResetPos
-00.00, ArmHigh
-00.00, Left,  20.0, 20, -108
-00.00, Right, 20.0, 20, -108
-01.50, Left,  20.0, 15, -108
-02.50, Left,  20.0, 20, -108
-03.00, Right, 20.0, 15, -108
-03.50, Right, 20.0, 20, -108
-#8.50, Eject
-#9.00, ResetPos
-#9.00, Left,  5.0, 5,  25
-#9.00, Right, 10.0, 10, 50
-#9.50, StopIntake
+/ CenterMoves.csv
+/ 
+// set move parameters
+ZeroPos()
+Accel(200)
+CoastVel(125)
 
-#10.00, ArmFloor
-#14.00, Open
-#14.50, PullIn
-#14.00, Close
-#14.50, StopIntake
-#14.00, ArmHigh
-#15.00, Eject
-15.00, Stop
+// move to switch
+JogMove( -125, -40, True )
+CubeOut( -.2 )
+CubeStop( .2 )
+
+//Move to Cube
+ZeroPos()
+Accel(200)
+CoastVel(40)
+ArmsOpen( 0 )
+LiftFloor( 0 )
+Move( 35, False )
+Arc( 45, 90, False )
+Move( 1.25, False)
+Arc( 30, 84, False )
+Move( 5, True )
+CubeIn( -.5 )
+ArmsClose( 0 )
+Move(-65, True)
+JogMove( 135, 35, True )
+CubeOut( -.2 )
+CubeStop( .2 )
+Stop()
+// Move Back to Switch
+LiftHigh( 0.5 )
+Move( -5, False )
+CubeStop( 0 )
+Arc( -30, -90, False )
+Move( -1.25, False)
+Arc( -45, -90, False )
+Move( -40, True )
+CubeOut( -.2 )
+CubeStop( .5 )
+
+// Move Out 
+Move( 5, False)
+Arc( 80, 30, False )
+Move( 15, False)
+
+
+
+
+
+
+
+
+
+

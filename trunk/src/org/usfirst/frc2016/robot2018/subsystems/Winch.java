@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
  *
  */
 public class Winch extends Subsystem {
-	public PowerDistributionPanel pdPanel;
+	//--public PowerDistributionPanel pdPanel;
 	private final String WINCHMOTOR = "Winch Motor";
 	private boolean upperLimitDetected = false;
 	private boolean lowerLimitDetected = false;
@@ -84,8 +84,8 @@ public class Winch extends Subsystem {
 			//we know we are at the bottom, so it's safe to clear the upper flag
 			upperLimitDetected = false;
 		}
-		SmartDashboard.putBoolean("Winch Upper Limit", !winchUpperLimit.get());
-		SmartDashboard.putBoolean("Winch Lower Limit", !winchLowerLimit.get());
+		//--SmartDashboard.putBoolean("Winch Upper Limit", !winchUpperLimit.get());
+		//--SmartDashboard.putBoolean("Winch Lower Limit", !winchLowerLimit.get());
 		writeTelemetyValues();
 	}
 	public void lift()
@@ -112,7 +112,7 @@ public class Winch extends Subsystem {
 	public void variable(double speed) {
 			speed = -applyDeadband(speed, .05);
 			lastSpeed = speed;
-			SmartDashboard.putNumber("WinchSpeed", speed);
+			//--SmartDashboard.putNumber("WinchSpeed", speed);
 		if (Robot.oi.operatorJoy.getRawButton(9)){
 			if (speed > 0) {
 				if(!upperLimitDetected) {

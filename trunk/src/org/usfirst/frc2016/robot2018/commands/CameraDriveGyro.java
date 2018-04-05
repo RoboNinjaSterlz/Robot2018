@@ -64,7 +64,8 @@ public class CameraDriveGyro extends Command {
     	 * Get the driving distance so we know when to stop
     	 */
     	startingAngle = Robot.gyro.getAngle();
-    	targetCorrection = SmartDashboard.getNumber("GearAlignAngleError", 1000);
+    	//--targetCorrection = SmartDashboard.getNumber("GearAlignAngleError", 1000);
+    	targetCorrection = -255;
     	if (targetCorrection < 30 && targetCorrection > -30) {
      		lastValidTargetCorrection = targetCorrection;
     	}
@@ -82,7 +83,8 @@ public class CameraDriveGyro extends Command {
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
     	boolean returnCode = false;
-    	targetDistance = SmartDashboard.getNumber("GearAlignDistance", 1000);
+    	//--targetDistance = SmartDashboard.getNumber("GearAlignDistance", 1000);
+    	targetDistance = -255;
     	//SmartDashboard.putNumber("Distance", targetDistance);
     	if (targetDistance < 10*12) {
     		returnCode = targetDistance < 25;
