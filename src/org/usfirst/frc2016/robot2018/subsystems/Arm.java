@@ -174,6 +174,19 @@ public class Arm extends Subsystem {
 		//-goToPreset(HIGH);
 		applyBrake();
 		lastPreset = -1;
+		/* Need to calibrate the relative encoder on the motor
+		 * to the absolute encoder on the shaft
+		 * The gear ratio is 64/1 so it should take 64 times as many ticks
+		 * of the motor to go the same distance
+		 * The motor encoder is connected to the armTalon,
+		 * The analog arm encoder is connected to the ??Talon
+		 * The analog encoder has a range of 2190 - 3680.
+		 * Read the analog encoder * 64 current motor position
+		 * Take the difference between the above number and 
+		 * the motor encoder value, and that should be the offset
+		 * We may want to take the slop out in one direction before
+		 * performing the above calculation.
+		 */
 	}
 
 
