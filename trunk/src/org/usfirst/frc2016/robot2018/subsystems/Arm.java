@@ -184,7 +184,6 @@ public class Arm extends Subsystem {
 		 * The absolute encoder has 4096 counts/rev
 		 * The relative encoder has 80 counts/rev
 		 * The counts per rev of the output shaft in relative counts is 5120
-		 * Soe 
 		 * The motor encoder is connected to the armTalon,
 		 * The analog arm encoder is connected to the right cube wheel Talon
 		 * The analog encoder has a range of 2190 - 3680.
