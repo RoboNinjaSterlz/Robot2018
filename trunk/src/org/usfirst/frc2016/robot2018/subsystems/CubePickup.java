@@ -286,6 +286,9 @@ public class CubePickup extends Subsystem {
 		ejectCubeActive = false;
 		shootCubeActive = false;
 	}
+	public int getAbsoluteArmEncoderCount() {
+		return talonCubeWheelRight.getSelectedSensorPosition(0);
+	}
 }
 
 

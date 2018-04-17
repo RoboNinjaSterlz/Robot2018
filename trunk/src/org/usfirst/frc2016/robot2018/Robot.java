@@ -159,6 +159,8 @@ public class Robot extends TimedRobot {
         
         cubePickup = new CubePickup();
         //--SmartDashboard.putData(cubePickup);
+        // Cube must be created before arm since arm will read values from 
+        // the left cube talon.
         
         arm = new Arm();
         //--SmartDashboard.putData(arm);
