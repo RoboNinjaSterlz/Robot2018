@@ -40,6 +40,9 @@ public class Arm extends Subsystem {
 
 	// Minimum number of good positions need to be in position
 	private final int MinimumGoodPositions = 4;
+	
+	// Offset used to convert old encoder to new encoder values
+	private int encoderOffset;
 	/*
 	 * Values set by config
 	 */
@@ -135,7 +138,8 @@ public class Arm extends Subsystem {
 
 	public Arm() {
 		loadConfig(Robot.config);
-		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute , 0, 0);
+//		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute , 0, 0);
+		armTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 		armTalon.setSensorPhase(true); //!!!! Check this !!!!!
 		armTalon.setInverted(true);
 		armTalon.configAllowableClosedloopError(0, 0, 0);
@@ -176,17 +180,23 @@ public class Arm extends Subsystem {
 		lastPreset = -1;
 		/* Need to calibrate the relative encoder on the motor
 		 * to the absolute encoder on the shaft
-		 * The gear ratio is 64/1 so it should take 64 times as many ticks
-		 * of the motor to go the same distance
+		 * The gear ratio is 64/1 
+		 * The absolute encoder has 4096 counts/rev
+		 * The relative encoder has 80 counts/rev
+		 * The counts per rev of the output shaft in relative counts is 5120
+		 * Soe 
 		 * The motor encoder is connected to the armTalon,
-		 * The analog arm encoder is connected to the ??Talon
+		 * The analog arm encoder is connected to the right cube wheel Talon
 		 * The analog encoder has a range of 2190 - 3680.
-		 * Read the analog encoder * 64 current motor position
+		 * Read the analog encoder *1.25 current motor position
 		 * Take the difference between the above number and 
 		 * the motor encoder value, and that should be the offset
 		 * We may want to take the slop out in one direction before
 		 * performing the above calculation.
 		 */
+		Double initialAbsolutePosition = 1.25*Robot.cubePickup.getAbsoluteArmEncoderCount();
+		int initialRelativePosition = armTalon.getSelectedSensorPosition(0);
+		encoderOffset = initialAbsolutePosition.intValue() - initialRelativePosition;
 	}
 
 
@@ -315,6 +325,8 @@ public class Arm extends Subsystem {
 
 	// mostly for debugging updates the smart dashboard with position info
 	public void periodic() {
+		SmartDashboard.putNumber("AbsoluteArmEncoder", Robot.cubePickup.getAbsoluteArmEncoderCount());
+		SmartDashboard.putNumber("RelativeEncoder", armTalon.getSelectedSensorPosition(0));
 		if (madeFirstMove) {
 			//---SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
 
