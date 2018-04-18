@@ -63,6 +63,9 @@ public class Arm extends Subsystem {
 	private final String ARMSCALEPOSITION = "Arm Scale Position";
 	private final String ARMBRAKESTATE = "Arm Brake State";
 
+	// Ratio of relative counts to absolute counts
+	private final double encoderRatio = 1.25;
+	
 	// Desired encoder count for positioning the armTaloner.
 	private double desiredPosition = 0;
 
@@ -140,8 +143,9 @@ public class Arm extends Subsystem {
 		loadConfig(Robot.config);
 //		armTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute , 0, 0);
 		armTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		armTalon.setSensorPhase(true); //!!!! Check this !!!!!
-		armTalon.setInverted(true);
+		armTalon.setSensorPhase(false); //!!!! Check this !!!!!
+//		armTalon.setInverted(true);
+		armTalon.setInverted(false);
 		armTalon.configAllowableClosedloopError(0, 0, 0);
 		armTalon.setNeutralMode(NeutralMode.Brake);
 		armTalon.configForwardLimitSwitchSource(
@@ -151,9 +155,11 @@ public class Arm extends Subsystem {
 				LimitSwitchSource.FeedbackConnector,
 				LimitSwitchNormal.NormallyOpen, 0);
 		armTalon.configForwardSoftLimitThreshold(armForwardSoftLimit, 0);
-		armTalon.configForwardSoftLimitEnable(true, 0);
+//		armTalon.configForwardSoftLimitEnable(true, 0);
+		armTalon.configForwardSoftLimitEnable(false, 0);
 		armTalon.configReverseSoftLimitThreshold(armReverseSoftLimit, 0);
-		armTalon.configReverseSoftLimitEnable(true, 0);
+//		armTalon.configReverseSoftLimitEnable(true, 0);
+		armTalon.configReverseSoftLimitEnable(false, 0);
 		armTalon.clearStickyFaults(0);
 		armTalon.setIntegralAccumulator(0, 0, 0);
 		armTalon.selectProfileSlot(0, 0);
@@ -196,6 +202,9 @@ public class Arm extends Subsystem {
 		Double initialAbsolutePosition = 1.25*Robot.cubePickup.getAbsoluteArmEncoderCount();
 		int initialRelativePosition = armTalon.getSelectedSensorPosition(0);
 		encoderOffset = initialAbsolutePosition.intValue() - initialRelativePosition;
+		SmartDashboard.putNumber("InitialAbsolutePosition", initialAbsolutePosition);
+		SmartDashboard.putNumber("InitialRelativePosition", initialRelativePosition);
+		SmartDashboard.putNumber("encoderOffset", encoderOffset);
 	}
 
 
@@ -229,7 +238,8 @@ public class Arm extends Subsystem {
 				armTalon.configMotionCruiseVelocity(armCruiseVelocity, 0);
 				armTalon.configMotionAcceleration(200, 0);
 			}
-			goTo(presetPositions[position]);
+//			goTo(presetPositions[position]);
+			goTo((presetPositions[position]*encoderRatio)-encoderOffset);
 			lastPreset=position;
 		}
 	}
@@ -326,14 +336,15 @@ public class Arm extends Subsystem {
 	public void periodic() {
 		SmartDashboard.putNumber("AbsoluteArmEncoder", Robot.cubePickup.getAbsoluteArmEncoderCount());
 		SmartDashboard.putNumber("RelativeEncoder", armTalon.getSelectedSensorPosition(0));
-		if (madeFirstMove) {
-			//---SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
+		if (madeFirstMove) 
+		{
+			SmartDashboard.putNumber("armTalon Desired Pos", armTalon.getClosedLoopTarget(0));
 
 			SmartDashboard.putNumber("Arm Position", getPosition());
-			//--SmartDashboard.putNumber("Arm Position Error", getPositionError());
-			//--SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
+			SmartDashboard.putNumber("Arm Position Error", getPositionError());
+			SmartDashboard.putBoolean("Arm is Positioned", isPositioned());
 //			SmartDashboard.putBoolean("Did Move",ArmMoved());
-			//--SmartDashboard.putNumber("Last Arm Position", lastPreset );
+			SmartDashboard.putNumber("Last Arm Position", lastPreset );
 		}
 		/*
 		 * The following is out for now. Add back if we need to tune the arm postion 
