@@ -1,0 +1,156 @@
+// AutoPilot.txt - move sequences for auto mode
+
+// enable tracing for to print debug information, comment out before competitions
+
+enableTracing()
+listCommands()
+
+//
+// AutoPilot Commands:
+//   Stop( ) : end processing of the file
+//   ListCommands( ) : lists all of the commands
+//   NewSequence( "sequenceName" ) : start a new named sequence
+//   EnableTracing( ) : turn on tracing
+//   AddSequence( "sequenceName" ) : adds an existing sequence to the current one
+//   MovePause( pauseSeconds ) : pause while stopped
+//   Move( deltaPos, Go|Stop ) : straight move, negative deltaPos moves backwards
+//   JogMove( moveLength, jogLength, Go|Stop ) : moves with a side offset
+//   SetCruiseVel( vel ) : sets movement cruise velocity
+//   SetTurnRadius( radius ) : sets turn radius
+//   ZeroPosition( ) : use the current position as the move starting location
+//   SetAccel( accel ) : sets maximum movement acceleration
+//   Turn( degrees, Forward|Backward, Go|Stop ) : turns along a radius
+//   SetTankWidth( tankWidth ) : sets the width of the tank drive
+//   OverlapNextAction( deltaSeconds ) : overlap next action with movement, can be negative to overlap with last move
+//
+// AutoRobotCommands Commands:
+//   IntakeWheels( In|Out|Stop ) : sets the intake wheels
+//   LiftTarget( Floor|Low|Medium|Scale|High ) : target for the lift arm
+//   IntakeArms( Open|Close ) : moves the intake arms
+
+//
+// move from center, place cube in left side of the switch, return to center
+//
+NewSequence("Center To Place Left")
+	// fast movement
+	SetAccel(150)
+	SetCruiseVel(100)
+	
+	// forward move to switch
+	//ZeroPosition()
+	LiftTarget( Medium )
+	JogMove( 133, 35, Stop )
+	
+	// execute action before the end of the last move
+	OverlapNextAction( -.5 )
+	IntakeWheels( Out )
+
+	
+	
+//
+// return from left switch to center
+//
+NewSequence("Place Left to Center")
+	
+	// execute action after the start of the next move
+	OverlapNextAction( .5 )
+	IntakeWheels( Stop )
+	
+	// back to wall
+	LiftTarget( Floor )
+	JogMove( -135, -35, Stop )
+
+
+
+//
+// move from center, place cube in right side of the switch
+//
+NewSequence("Center To Place Right")
+	// move speed
+	SetAccel(150)
+	SetCruiseVel(100)
+	
+	// forward move to switch
+	//ZeroPosition()
+	LiftTarget( Medium )
+	JogMove( 128, -30, Stop )
+	
+	// execute action before the end of the last move
+	OverlapNextAction( -.5 )
+	IntakeWheels( Out )
+	
+
+	
+//
+// return from right switch to center
+//
+NewSequence("Place Right to Center")
+	
+	// execute action after the start of the next move
+	OverlapNextAction( .5 )
+	IntakeWheels( Stop )
+	
+	// back to wall
+	LiftTarget( Floor )
+	JogMove( -128, -30, Stop )
+
+
+//
+// return from left switch to center
+//
+NewSequence("Place Left")
+	AddSequence("Center To Place Left")
+	AddSequence("Place Left to Center")
+	
+
+	
+//
+// return from left switch to center
+//
+NewSequence("Place Right")
+	AddSequence("Center To Place Right")
+	AddSequence("Place Right to Center")
+
+
+//
+// get cube from center cube stack
+//
+NewSequence("Get Center Cube")
+	// move speed
+	SetAccel(150)
+	SetCruiseVel(100)
+
+	// out to cube stack
+	IntakeArms( Open )
+	JogMove( 72, 5, Stop )
+
+	// execute action before the end of the last move
+	OverlapNextAction( -.5 )
+	IntakeWheels( In )
+	
+	// execute action before the end of the last move
+	OverlapNextAction( -.5 )
+	IntakeArms( Close )
+	
+	LiftTarget( Medium )
+	
+	// back to wall
+	JogMove( -77, -5, Stop )
+	IntakeWheels( Stop )
+
+
+//
+// Two cube auto, Left
+//
+NewSequence("2Cube-L")
+	AddSequence("Place Left")
+	AddSequence("Get Center Cube")
+	AddSequence("Place Left")
+
+//
+// Two cub auto, right
+//
+NewSequence("2Cube-R")
+	AddSequence("Place Right")
+	AddSequence("Get Center Cube")
+	AddSequence("Place Right")	
