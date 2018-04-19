@@ -41,6 +41,7 @@ public class RobotMap {
     public static WPI_TalonSRX winchWinchTalon;
     public static DigitalInput winchWinchUpperLimit;
     public static DigitalInput winchWinchLowerLimit;
+    public static WPI_TalonSRX winchElevatorTalon;
     public static PowerDistributionPanel currentMonitorPowerDistributionPanel1;
     public static WPI_TalonSRX driveTrainSRXTalonDriveLeft2;
     public static WPI_TalonSRX driveTrainSRXTalonDriveLeft3;
@@ -68,13 +69,16 @@ public class RobotMap {
         
         
         winchWinchUpperLimit = new DigitalInput(1);
-        //--LiveWindow.addSensor("Winch", "WinchUpperLimit", winchWinchUpperLimit);
+        LiveWindow.addSensor("Winch", "WinchUpperLimit", winchWinchUpperLimit);
         
         winchWinchLowerLimit = new DigitalInput(2);
-        //--LiveWindow.addSensor("Winch", "WinchLowerLimit", winchWinchLowerLimit);
+        LiveWindow.addSensor("Winch", "WinchLowerLimit", winchWinchLowerLimit);
+        
+        winchElevatorTalon = new WPI_TalonSRX(9);
+        
         
         currentMonitorPowerDistributionPanel1 = new PowerDistributionPanel(0);
-        //--LiveWindow.addSensor("CurrentMonitor", "PowerDistributionPanel 1", currentMonitorPowerDistributionPanel1);
+        LiveWindow.addSensor("CurrentMonitor", "PowerDistributionPanel 1", currentMonitorPowerDistributionPanel1);
         
         driveTrainSRXTalonDriveLeft2 = new WPI_TalonSRX(1);
         
@@ -88,7 +92,7 @@ public class RobotMap {
         driveTrainSRXTalonDriveRight3 = new WPI_TalonSRX(5);
         
         
-		driveTrainSRXTalonDriveLeft1 = new WPI_TalonSRX(0);
+        driveTrainSRXTalonDriveLeft1 = new WPI_TalonSRX(0);
         
         
         driveTrainSRXTalonDriveRight1 = new WPI_TalonSRX(3);
