@@ -124,6 +124,7 @@ public class Winch extends Subsystem {
 		winchTalon.set(0);
 	}
 
+
 	public void variable(double speed) {
 			speed = -applyDeadband(speed, .05);
 			lastSpeed = speed;
