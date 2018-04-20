@@ -107,6 +107,7 @@ public class Winch extends Subsystem {
 		}
 		//--SmartDashboard.putBoolean("Winch Upper Limit", !winchUpperLimit.get());
 		//--SmartDashboard.putBoolean("Winch Lower Limit", !winchLowerLimit.get());
+		SmartDashboard.putNumber("Winch Encoder", winchTalon.getSelectedSensorPosition(0));
 		writeTelemetyValues();
 	}
 	public void lift()
