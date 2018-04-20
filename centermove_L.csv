@@ -1,12 +1,75 @@
 / CenterMoves.csv
 / 
 // set move parameters
-ZeroPos()
-Accel(200)
-CoastVel(125)
 
-// move to switch
-JogMove( -125, -40, True )
+///// ///// ///// ///// ///// ///// ///// 
+///// forward move to switch
+// fast moves
+Accel(150)
+CoastVel(100)
+
+// forward move to switch
+ZeroPos()
+LiftFront(0)
+JogMove( 133, 35, True )
+
+// place cube
+CubeOut( .05 )
+CubeStop( .3 )
+
+// back to wall
+LiftFloor( 0 )
+JogMove( -135, -35, True )
+
+///// ///// ///// ///// ///// ///// ///// ///// 
+// slow moves
+Accel(100)
+CoastVel(75)
+
+// out to cube stack
+ArmsOpen( .2 )
+JogMove( 72, 5, True )
+
+// grab cube
+CubeIn( -.5 )
+ArmsClose( .5 )
+LiftFront(0)
+
+// back to wall
+JogMove( -82, -5, True )
+CubeStop( .2 )
+
+///// ///// ///// ///// ///// ///// ///// ///// 
+// out to switch
+
+// fast moves
+Accel(150)
+CoastVel(100)
+
+// forward move to switch
+LiftFront(0)
+JogMove( 134, 35, True )
+
+// place cube
+CubeOut( .05 )
+CubeStop( .3 )
+
+// back to wall
+LiftFloor( 0 )
+JogMove( -134, -35, True )
+
+// prepare to start vault
+Move( 10, True )
+
+Stop()
+
+///// backwards move to switch
+// fast moves
+Accel(150)
+CoastVel(100)
+
+LiftHigh(0)
+JogMove( -147, -40, True )
 CubeOut( -.2 )
 CubeStop( .2 )
 
@@ -14,20 +77,23 @@ CubeStop( .2 )
 ZeroPos()
 Accel(200)
 CoastVel(40)
-ArmsOpen( 0 )
 LiftFloor( 0 )
 Move( 35, False )
 Arc( 45, 90, False )
 Move( 1.25, False)
-Arc( 30, 84, False )
-Move( 5, True )
+ArmsOpen( 0 )
+Arc( 45, 120, False )
+Move( 10, True )
 CubeIn( -.5 )
 ArmsClose( 0 )
 Move(-65, True)
+CubeStop( .2 )
+LiftFront( 0 )
 JogMove( 135, 35, True )
+Stop()
 CubeOut( -.2 )
 CubeStop( .2 )
-Stop()
+
 // Move Back to Switch
 LiftHigh( 0.5 )
 Move( -5, False )
@@ -44,12 +110,4 @@ Move( 5, False)
 Arc( 80, 30, False )
 Move( 15, False)
 
-
-
-
-
-
-
-
-
-
+Stop()
