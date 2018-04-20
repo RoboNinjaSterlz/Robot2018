@@ -1,17 +1,20 @@
-package testDrive;
+package org.usfirst.frc2016.robot2018.commands;
+
+import org.usfirst.frc2016.robot2018.Robot;
+import org.usfirst.frc2016.robot2018.commands.AutoPilot.AutoPilotMethod;
+
+import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-//--import org.usfirst.frc2016.robot2018.Robot;
+public class AutoPilotCommand extends Command {
 
-import testDrive.AutoPilot.AutoPilotCommand;
-
-public class AutoRobotCommands {
-
-	// -- private String moveFilePath = "/c"; /** Default: /c folder. */
-	private String moveFilePath = "src\\testDrive\\";
+	private String moveFilePath = "/c/";
+	/** Default: /c folder. */
+	// --private String moveFilePath = "src\\testDrive\\";
 
 	AutoPilot autoPilot;
 	String lastStatus;
@@ -30,13 +33,13 @@ public class AutoRobotCommands {
 		FLOOR, LOW, MEDIUM, SCALE, HIGH
 	}
 
-	public AutoRobotCommands() {
+	public AutoPilotCommand() {
 		autoPilot = new AutoPilot(this);
 		driveUpdateTimer = new Timer("DriveUpdateThread", true);
 		// autoPilot.listCommands();
 
 		autoPilot.loadFile(moveFilePath + "AutoPilot.txt");
-		// SmartDashboard.putNumber("AutoPilotStatus", autoPilot.getStatus());
+		SmartDashboard.putString("AutoPilotStatus", autoPilot.getStatus());
 
 		if (!autoPilot.isTracing()) {
 			lastStatus = autoPilot.getStatus();
@@ -45,25 +48,20 @@ public class AutoRobotCommands {
 	}
 
 	// Called just before this Command runs the first time
-	// -- @Override
+	@Override
 	protected void initialize() {
-		// --Robot.driveTrainSRX.resetEncoders();
+		Robot.driveTrainSRX.resetEncoders();
 		autoPilot.setTracing(false);
 		autoPilot.startSequence("2Cube-L", getDriveDistances());
 		startTimerTask();
 	}
 
 	// Called repeatedly when this Command is scheduled to run
-	// --@Override
+	@Override
 	public void execute() {
 
-//		double[] driveDistances = autoPilot.execute();
-//		if (null != driveDistances) {
-//			// --Robot.driveTrainSRX.goToDistance(driveDistances[AutoPilot.DRIVE_MOTOR_LEFT],
-//			// driveDistances[AutoPilot.DRIVE_MOTOR_RIGHT]);
-//			// --Robot.driveTrainSRX.pingDifferentialDrive();
-//		}
-//		// --SmartDashboard.putString("AutoPilotStatus", autoPilot.getStatus());
+		Robot.driveTrainSRX.pingDifferentialDrive();
+		SmartDashboard.putString("AutoPilotStatus", autoPilot.getStatus());
 
 		if (!autoPilot.isTracing()) {
 			String status = autoPilot.getStatus();
@@ -102,22 +100,24 @@ public class AutoRobotCommands {
 		Double[] distances = new Double[AutoPilot.MOTOR_MAX];
 		distances[AutoPilot.MOTOR_LEFT] = 0.0;
 		distances[AutoPilot.MOTOR_RIGHT] = 0.0;
-		// --Robot.driveTrainSRX.resetEncoders();
-		// --distances[0] = Robot.driveTrainSRX.getLeftDistance();
-		// --distances[1] = Robot.driveTrainSRX.getRightDistance();
+		
+		Robot.driveTrainSRX.resetEncoders();
+		distances[AutoPilot.MOTOR_LEFT] = Robot.driveTrainSRX.getLeftDistance();
+		distances[AutoPilot.MOTOR_RIGHT] = Robot.driveTrainSRX.getRightDistance();
 		return distances;
 	}
 
 	private void shutdown() {
 		killTimerTask();
-		// --Robot.cubePickup.autoEnd();
-		// --Robot.driveTrainSRX.driveStop();
+		Robot.cubePickup.autoEnd();
+		Robot.driveTrainSRX.driveStop();
 	}
 
 	private void startTimerTask() {
 		killTimerTask();
 		driveUpdateTimer = new Timer();
-		driveUpdateTimer.scheduleAtFixedRate(new DriveTimerTask(), nDriveUpdateMs, nDriveUpdateMs);
+		driveUpdateTimer.scheduleAtFixedRate(new DriveTimerTask(),
+				nDriveUpdateMs, nDriveUpdateMs);
 	}
 
 	private void killTimerTask() {
@@ -133,56 +133,57 @@ public class AutoRobotCommands {
 		public void run() {
 			if (autoPilot.isFinished()) {
 				killTimerTask();
-			}
-			else {
+			} else {
 				double[] driveDistances = autoPilot.execute();
 				if (null != driveDistances) {
-					//--Robot.driveTrainSRX.goToDistance(driveDistances[AutoPilot.DRIVE_MOTOR_LEFT], driveDistances[AutoPilot.DRIVE_MOTOR_RIGHT]);
-					//--Robot.driveTrainSRX.pingDifferentialDrive();
+					
+					Robot.driveTrainSRX.goToDistance(
+							driveDistances[AutoPilot.MOTOR_LEFT],
+							driveDistances[AutoPilot.MOTOR_RIGHT]);
 				}
 			}
 		}
 	}
 
-	@AutoPilotCommand(argHint = "( Open|Close ) : moves the intake arms")
+	@AutoPilotMethod(argHint = "( Open|Close ) : moves the intake arms")
 	public void intakeArms(ArmState newArmState) {
 
 		switch (newArmState) {
 
 		case OPEN:
-			// --Robot.cubePickup.openArms();
+			Robot.cubePickup.openArms();
 			break;
 
 		default:
 		case CLOSE:
-			// --Robot.cubePickup.closeArms();
+			Robot.cubePickup.closeArms();
 			break;
 
 		}
 	}
 
-	@AutoPilotCommand(argHint = "( In|Out|Stop ) : sets the intake wheels")
+	@AutoPilotMethod(argHint = "( In|Out|Stop ) : sets the intake wheels")
 	public void intakeWheels(IntakeState newIntakeState) {
-		
+
 		switch (newIntakeState) {
-		
+
 		case IN:
-			// --Robot.cubePickup.acquireCube();
+			Robot.cubePickup.acquireCube();
 			break;
 
 		case OUT:
-			// --Robot.cubePickup.autoEjectCube();
+			Robot.cubePickup.autoEjectCube();
 			break;
 
 		default:
 		case STOP:
-			// --Robot.cubePickup.autoEnd();
+			Robot.cubePickup.autoEnd();
 			break;
 		}
 	}
 
-	@AutoPilotCommand(argHint = "( Floor|Low|Medium|Scale|High ) : target for the lift arm")
+	@AutoPilotMethod(argHint = "( Floor|Low|Medium|Scale|High ) : target for the lift arm")
 	public void liftTarget(LiftPosition newTarget) {
-		// --Robot.arm.goToPreset(newTarget.ordinal());
+		Robot.arm.goToPreset(newTarget.ordinal());
 	}
 }
