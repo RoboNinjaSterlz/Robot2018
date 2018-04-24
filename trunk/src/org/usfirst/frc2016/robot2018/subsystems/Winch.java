@@ -17,6 +17,7 @@ import org.usfirst.frc2016.robot2018.Robot;
 import org.usfirst.frc2016.robot2018.RobotMap;
 import org.usfirst.frc2016.robot2018.commands.WinchJoy;
 
+
 //import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -42,13 +43,15 @@ public class Winch extends Subsystem {
 	private boolean upperLimitDetected = false;
 	private boolean lowerLimitDetected = false;
 	private double lastSpeed;
-	private final int cruiseVelocity = 125;
-	private final int acceleration = 200;
+	private final int cruiseVelocity = 450;
+	private final int acceleration = 300;
+	private final int AbsoluteTolerance = 3;
+	private int finalPosition;
 	/*
 	 * Values set by config
 	 */
 	private double stopDelay;
-	private int elevatorTravelCounts;
+	private int elevatorTravelCounts;   // 13.5 turns
 	
 	/* End config values */
 
@@ -83,7 +86,7 @@ public class Winch extends Subsystem {
 
 		elevatorTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
 		elevatorTalon.setSensorPhase(false); //!!!! Check this !!!!!
-		elevatorTalon.setInverted(false);
+		elevatorTalon.setInverted(true);
 		elevatorTalon.configAllowableClosedloopError(0, 0, 0);
 		elevatorTalon.configForwardLimitSwitchSource(
 				LimitSwitchSource.FeedbackConnector,
@@ -93,7 +96,11 @@ public class Winch extends Subsystem {
 		elevatorTalon.clearStickyFaults(0);
 		elevatorTalon.setIntegralAccumulator(0, 0, 0);
 		elevatorTalon.setNeutralMode(NeutralMode.Brake);
-		elevatorTalon.set(ControlMode.PercentOutput, 0);
+		elevatorTalon.config_kP(0, 40, 0);
+		elevatorTalon.config_kI(0, 0, 0);
+		elevatorTalon.config_kD(0, 0, 0);
+		elevatorTalon.config_kF(0, 0, 0);
+	elevatorTalon.set(ControlMode.PercentOutput, 0);
 	}
 	public void periodic() {
 		//    	Robot.currentMonitor.winchCurrentReport(winchTalon.get());
@@ -107,7 +114,7 @@ public class Winch extends Subsystem {
 		}
 		//--SmartDashboard.putBoolean("Winch Upper Limit", !winchUpperLimit.get());
 		//--SmartDashboard.putBoolean("Winch Lower Limit", !winchLowerLimit.get());
-		SmartDashboard.putNumber("Winch Encoder", winchTalon.getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("Winch Encoder", elevatorTalon.getSelectedSensorPosition(0));
 		writeTelemetyValues();
 	}
 	public void lift()
@@ -133,7 +140,7 @@ public class Winch extends Subsystem {
 
 	public void elevatorUp() {
 		int currentPosition = elevatorTalon.getSelectedSensorPosition(0);
-		int finalPosition = currentPosition+elevatorTravelCounts;
+		finalPosition = currentPosition-elevatorTravelCounts;
 		elevatorTalon.configMotionCruiseVelocity(cruiseVelocity, 0);
 		elevatorTalon.configMotionAcceleration(acceleration, 0);
 		elevatorTalon.set(ControlMode.MotionMagic, finalPosition);
@@ -141,10 +148,30 @@ public class Winch extends Subsystem {
 
 	public void elevatorDown() {
 		int currentPosition = elevatorTalon.getSelectedSensorPosition(0);
-		int finalPosition = currentPosition+elevatorTravelCounts;
-		elevatorTalon.configMotionCruiseVelocity(cruiseVelocity, 0);
-		elevatorTalon.configMotionAcceleration(acceleration, 0);
+		finalPosition = currentPosition+elevatorTravelCounts;
+		elevatorTalon.configMotionCruiseVelocity(cruiseVelocity/12, 0);
+		elevatorTalon.configMotionAcceleration(acceleration/6, 0);
 		elevatorTalon.set(ControlMode.MotionMagic, finalPosition);
+	}
+	public int getPosition() {
+		return elevatorTalon.getSelectedSensorPosition(0);
+	}
+	
+	public boolean isElevatorPositioned() {
+		double positionError;
+		positionError = Math.abs(finalPosition - getPosition());
+		/*
+		 * The following is only valid for relative encoders
+		if (desiredPosition == 0 && armTalon.getSensorCollection().isRevLimitSwitchClosed()) 
+			armTalon.set(ControlMode.Position, 0);
+		}
+		 */
+		if (positionError <= AbsoluteTolerance) {
+				return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	
