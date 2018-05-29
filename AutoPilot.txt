@@ -36,19 +36,20 @@ listMethods()
 //	SetAccel(150)
 //	SetCruiseVel(100)
 // slow
-	SetAccel(150)
-	SetCruiseVel(100)
+	SetAccel(100)
+	SetCruiseVel(75)
 
 NewSequence("Center To Place Left")
+	SetAccel(150)
+	SetCruiseVel(100)
 	
 	// forward move to switch
 	//ZeroPosition()
 	LiftTarget( Medium )
 	//-- MAR Distance: JogMove( 133, 35, Stop )
-	JogMove( 123, 30, Stop )
+	JogMove( 130, 34, Stop )
 	
 	// execute action before the end of the last move
-	OverlapNextAction( -.5 )
 	IntakeWheels( Out )
 
 	
@@ -57,6 +58,8 @@ NewSequence("Center To Place Left")
 // return from left switch to center
 //
 NewSequence("Place Left to Center")
+	SetAccel(150)
+	SetCruiseVel(100)
 	
 	// execute action after the start of the next move
 	OverlapNextAction( .5 )
@@ -65,7 +68,7 @@ NewSequence("Place Left to Center")
 	// back to wall
 	LiftTarget( Floor )
 	//-- MAR Distance: JogMove( -135, -35, Stop )
-	JogMove( -123, -30, Stop )
+	JogMove( -130, -34, Stop )
 
 
 
@@ -73,14 +76,15 @@ NewSequence("Place Left to Center")
 // move from center, place cube in right side of the switch
 //
 NewSequence("Center To Place Right")
+	SetAccel(150)
+	SetCruiseVel(100)
 	
 	// forward move to switch
 	//ZeroPosition()
 	LiftTarget( Medium )
-	JogMove( 128, -30, Stop )
+	JogMove( 129, -27, Stop )
 	
 	// execute action before the end of the last move
-	OverlapNextAction( -.5 )
 	IntakeWheels( Out )
 	
 
@@ -89,6 +93,8 @@ NewSequence("Center To Place Right")
 // return from right switch to center
 //
 NewSequence("Place Right to Center")
+	SetAccel(150)
+	SetCruiseVel(100)
 	
 	// execute action after the start of the next move
 	OverlapNextAction( .5 )
@@ -96,7 +102,7 @@ NewSequence("Place Right to Center")
 	
 	// back to wall
 	LiftTarget( Floor )
-	JogMove( -128, -30, Stop )
+	JogMove( -129, 27, Stop )
 
 
 //
@@ -120,23 +126,25 @@ NewSequence("Place Right")
 // get cube from center cube stack
 //
 NewSequence("Get Center Cube")
+	SetAccel(150)
+	SetCruiseVel(75)
 
 	// out to cube stack
 	IntakeArms( Open )
-	JogMove( 72, 5, Stop )
+	JogMove( 67, 7, Stop )
 
 	// execute action before the end of the last move
-	OverlapNextAction( -.5 )
 	IntakeWheels( In )
 	
 	// execute action before the end of the last move
-	OverlapNextAction( -.5 )
+	OverlapNextAction( -.2 )
 	IntakeArms( Close )
-	
+	MovePause( .5 )
+	OverlapNextAction( 1.0 )
 	LiftTarget( Medium )
 	
 	// back to wall
-	JogMove( -77, -5, Stop )
+	JogMove( -67, -7, Stop )
 	IntakeWheels( Stop )
 
 
@@ -147,7 +155,8 @@ NewSequence("L - Switch Front")
 	AddSequence("Place Left")
 	AddSequence("Get Center Cube")
 	AddSequence("Place Left")
-
+	AddSequence("Place Left to Center")
+	Move(10, Stop)
 //
 // Two cube auto, right
 //
@@ -155,24 +164,80 @@ NewSequence("R - Switch Front")
 	AddSequence("Place Right")
 	AddSequence("Get Center Cube")
 	AddSequence("Place Right")
-	
-//
-// Left Switch to Left Scale
+	AddSequence("Place Right to Center")
+	Move(10, Stop)
+
+// Right Switch to Left Scale
 //	
-NewSequence("Left Switch to Left Scale")
+NewSequence("Right Switch to Left Scale")
+	SetAccel(150)
+	SetCruiseVel(100)
 	
 	OverlapNextAction( .5 )
 	IntakeWheels( Stop )
 
-	SetTurnRadius(45)
-	Turn( -200, Backward, Go)
+	SetTurnRadius(40)
+	Turn( -100, Backward, Go)
+	Move( -150, Go )
+	LiftTarget( Floor )
+	
+	//////  move back to
+	Turn( -100, Backward, Stop)
+
+// Left Switch to Right Scale
+//	
+NewSequence("Left Switch to Right Scale")
+	SetAccel(150)
+	SetCruiseVel(75)
+	
+	OverlapNextAction( .5 )
+	IntakeWheels( Stop )
+
+	SetTurnRadius(40)
+	Turn( 100, Backward, Go)
+	Move( -150, Go )
+	LiftTarget( Floor )
+	
+	//////  move back to
+	Turn( 100, Backward, Stop)
+
+// Right Switch to Right Scale
+//	
+NewSequence("Right Switch to Right Scale")
+	SetAccel(150)
+	SetCruiseVel(100)
+	
+	OverlapNextAction( .5 )
+	IntakeWheels( Stop )
+
+	SetTurnRadius(40)
+	Turn( 220, Backward, Go)
 	Move( -70, Go )
 	LiftTarget( Floor )
 	
 	//////  move back to
-	//Turn( -35, Backward, Go)
-	//Move( -10, Go )
+	Turn( 40, Backward, Go)
+	Move( -35, Stop )	
+//
+// Left Switch to Left Scale
+//	
+NewSequence("Left Switch to Left Scale")
+	SetAccel(150)
+	SetCruiseVel(80)
+	
+	OverlapNextAction( .5 )
+	IntakeWheels( Stop )
+
+	SetTurnRadius(40)
+	Turn( -220, Backward, Go)
+	Move( -70, Go )
+	LiftTarget( Floor )
+	
+	//////  move back to
+	Turn( -40, Backward, Go)
+	Move( -35, Stop )
 	//
+	
 	//SetTurnRadius(35)
 	//Turn(65, Backward, Stop )
 	//
@@ -182,23 +247,23 @@ NewSequence("Left Switch to Left Scale")
 	/////
 	
 	// execute action before the end of the last move
-	OverlapNextAction( -.5 )
-	IntakeWheels( In )
+//	OverlapNextAction( -.5 )
+//	IntakeWheels( In )
 	
 	// execute action before the end of the last move
-	OverlapNextAction( -.5 )
-	IntakeArms( Close )
+//	OverlapNextAction( -.5 )
+//	IntakeArms( Close )
 	
-	LiftTarget( Medium )
-	MovePause( .5 )
+//	LiftTarget( Medium )
+//	MovePause( .5 )
 	
-	IntakeWheels( Stop )
+//	IntakeWheels( Stop )
 
-	Move( 15, Stop )
+//	Move( 15, Stop )
 	
 	// execute action before the end of the last move
-	OverlapNextAction( -.5 )
-	IntakeWheels( Out )
+//	OverlapNextAction( -.5 )
+//	IntakeWheels( Out )
 
 //
 // Place From Scale
@@ -219,22 +284,23 @@ NewSequence("Place Scale")
 // Switch Front/Back  Left Switch ours, Left Scale ours
 //
 NewSequence("LL - Switch Front-Back")
-
-	// place auto cube in our switch
+	// 2 cube auto
+	AddSequence("Place Left")
+	AddSequence("Get Center Cube")
 	AddSequence("Center To Place Left")
 	
 	// cross field to cube behind switch next to their scale
-	//AddSequence("Left Switch to Right Scale")
+	AddSequence("Left Switch to Right Scale")
 
 	
 //
 // Switch Front/Back  Left Switch ours, Right Scale ours
 //
 NewSequence("LR - Switch Front-Back")
-
-	// place auto cube in our switch
+	// 2 cube auto
+	AddSequence("Place Left")
+	AddSequence("Get Center Cube")
 	AddSequence("Center To Place Left")
-	
 	// get cube behind switch on our side
 	AddSequence("Left Switch to Left Scale")
 
@@ -243,23 +309,27 @@ NewSequence("LR - Switch Front-Back")
 // Switch Front/Back  Right Switch ours, Right Scale ours
 //
 NewSequence("RR - Switch Front-Back")
-
-	// place auto cube in our switch
+	// 2 cube auto
+	AddSequence("Place Right")
+	AddSequence("Get Center Cube")
 	AddSequence("Center To Place Right")
 	
+	
 	// cross field to cube behind switch next to their scale
-	//AddSequence("Right Switch to Left Scale")
+	AddSequence("Right Switch to Left Scale")
 
 	
 //
 // Switch Front/Back  Right Switch ours, Left Scale ours
 //
 NewSequence("RL - Switch Front-Back")
-
-	// place auto cube in our switch
+	// 2 cube auto
+	AddSequence("Place Right")
+	AddSequence("Get Center Cube")
 	AddSequence("Center To Place Right")
 	
+	
 	// get cube behind switch on our side
-	//AddSequence("Right Switch to Right Scale")
+	AddSequence("Right Switch to Right Scale")
 	
 	
