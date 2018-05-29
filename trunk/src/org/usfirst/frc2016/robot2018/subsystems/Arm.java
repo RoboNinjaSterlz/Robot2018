@@ -179,7 +179,7 @@ public class Arm extends Subsystem {
 		armTalon.configPeakOutputReverse(-.5, 0);
 		/* set acceleration and vcruise velocity - see documentation */
 		armTalon.configMotionCruiseVelocity(armCruiseVelocity, 0);
-		armTalon.configMotionAcceleration(200, 0);
+		armTalon.configMotionAcceleration(300, 0);
 		//armTalon.set(ControlMode.MotionMagic, presetPositions[HIGH]);
 		//-goToPreset(HIGH);
 		applyBrake();
